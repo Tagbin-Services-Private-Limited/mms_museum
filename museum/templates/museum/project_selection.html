@@ -1,0 +1,166 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Project Selection {%endblock%} {% block head %}
+<link rel="stylesheet" href="{% static 'vendors/dropzone/dropzone.css' %}" type="text/css" /> {% endblock %} {% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h6 class="card-title">Project Selection</h6>
+                <div class="alert alert-danger" style="display:none">
+                    <strong id="err"></strong>
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+                <!-- form -->
+                <form action="" method="POST" id="content_upload">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="form-group col-md-6">
+                            <label>Current Organization</label>
+                            <input type="text" name="org" value="{{organization.name}}" name="organization">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Project Selection</label>
+                            <select name="proj" class="form-control" name="filename" id="filename">
+                                <option value="" disabled selected>Select Project</option>
+                        {% for x in project_selection %}
+                        <option value="{{x.name}}">{{x.name}}</option>
+                        {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" id="sub">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dropzone/dropzone.js' %}"></script>
+<!-- <script>
+    Dropzone.autoDiscover = false
+    
+    var x = JSON.parse(`{{ node_detail | safe }}`)
+    var myDropzone;
+    $(document).ready(function() {
+        $("#installation_name").change(function() {
+            let id = $(this).val()
+            $("#filename").html('<option value="">----select----</option>');
+            if (x[id]) {
+                $.each(x[id]['file'], function(k, v) {
+                    $("#filename").append('<option value="' + k + '">' + v['desrciption'] + '(' + v["file_name"] + ')</option>');
+                })
+            } else {
+                toastr.error("Try after refresh the page")
+            }
+        })
+    })
+
+    myDropzone = new Dropzone("div#fileup", {
+        url: "",
+        addRemoveLinks: true,
+        paramName: "files",
+        maxFilesize: 300.0,
+        maxFiles: 1,
+        parallelUploads: 10000,
+        uploadMultiple: false,
+        acceptedFiles: 'image/*,video/*',
+        headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        autoProcessQueue: false,
+        init: function() {
+
+            var myDropzonee = this;
+
+            // Update selector to match your button
+            $("#sub").click(function(e) {
+                e.preventDefault();
+                if ($("#installation_name").val().trim() == '') {
+                    toastr.error("Select installation")
+                    return false;
+                }
+                if ($("#filename").val().trim() == '') {
+                    toastr.error("Select File Name")
+                    return false;
+                }
+                if (myDropzone.files.length < 1) {
+                    toastr.error("Select File")
+                    return false;
+                }
+                if (getExtension(myDropzone.files[0].name) != x[$("#installation_name").val()]['file'][$("#filename").val()]["file_name"].split(".")[1]) {
+                    toastr.error("Invalid File Type.")
+                    return false
+                }
+                myDropzonee.processQueue();
+            });
+
+            this.on('sending', function(file, xhr, formData) {
+                // Append all form inputs to the formData Dropzone will POST
+
+
+                if ((isImage(file.name) && file.size < 10 * 1024 * 1024) || (isVideo(file.name) && file.size < 25 * 1024 * 1024)) {
+
+                    showLoader()
+                    $(".dz-remove").hide()
+                    $(".progress").show()
+                        // $("input[name='filename']").val($("#installation_name").val().trim() + "." + getExtension(file.name))
+                        // $("input[name='filename']").val($("#installation_name").val().trim())
+                    var data = $('#content_upload').serializeArray();
+                    $.each(data, function(key, el) {
+                        formData.append(el.name, el.value);
+                    });
+                    console.log(formData)
+                } else {
+                    toastr.error("Invalid Image or video")
+                }
+
+            });
+            this.on("success", function(file, response) {
+                hideLoader()
+                $("select").val('');
+                myDropzone.removeAllFiles()
+                swal({
+                    text: "Document Upload Successfully!",
+                    icon: "success",
+                    buttons: true,
+                }).then((willDelete) => {
+                    window.location.reload();
+                });
+            })
+            this.on('error', function(files, response) {
+                // `errormultiple` to un-hide the button
+                console.log(response)
+                toastr.error("Something went wrong... Please try after refresh ")
+            });
+        }
+    })
+
+    function getExtension(filename) {
+        var parts = filename.split('.');
+        return parts[parts.length - 1];
+    }
+
+    function isImage(filename) {
+        var ext = getExtension(filename);
+        switch (ext.toLowerCase()) {
+            case 'jpg':
+            case 'png':
+                //etc
+                return true;
+        }
+        return false;
+    }
+
+    function isVideo(filename) {
+        var ext = getExtension(filename);
+        switch (ext.toLowerCase()) {
+            case 'm4v':
+            case 'avi':
+            case 'mpg':
+            case 'mp4':
+                // etc
+                return true;
+        }
+        return false;
+    }
+</script> -->
+{% endblock %}

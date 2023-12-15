@@ -1,0 +1,46 @@
+from django.urls import path
+from .views import *
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('node_register/',node_registration.as_view(), name='node_registration'),
+    path('heartbeat/',node_log.as_view(),name='heartbeat'),
+    path('command_log_api/',command_log_api.as_view(),name='command_log_api'),
+    path('',login_view,name='login'),
+    path('project_selection/',project_selection,name='project_selection'),
+    path('<int:org_id>/<int:proj_id>/dashboard/',dashboard,name='dashboard'),
+    path('<int:org_id>/<int:proj_id>/devices/',devices,name='devices'),
+    path('<int:org_id>/<int:proj_id>/devices_v2/',devices_v2,name='devices_v2'),
+    path('<int:org_id>/<int:proj_id>/projectors/',Projectors,name='projectors'),
+    path('<int:org_id>/<int:proj_id>/control_panel/',control_panel,name='control_panel'),
+    path('<int:org_id>/<int:proj_id>/control_panel_v2/',control_panel_v2,name='control_panel_v2'),
+    path('<int:org_id>/<int:proj_id>/devices1/',devices1,name='devices1'),
+    path('<int:org_id>/<int:proj_id>/content_upload/',content_upload,name='content_upload'),
+    path('<int:org_id>/<int:proj_id>/content_upload_v2/',content_upload_v2,name='content_upload_v2'),
+    path('<int:org_id>/<int:proj_id>/command_logs/',command_logs,name='command_logs'),
+    path('<int:org_id>/<int:proj_id>/software_update/',software_update,name='software_update'),
+    path('<int:org_id>/<int:proj_id>/software_update_v2/',software_update_v2,name='software_update_v2'),
+    path('<int:org_id>/<int:proj_id>/show/',show,name='show'),
+    path('<int:org_id>/<int:proj_id>/reports/',reports,name='reports'),
+    path('<int:org_id>/<int:proj_id>/downtime_detail/',downtime_detail,name='downtime_detail'),
+    path('<int:org_id>/<int:proj_id>/analytics/',pm_count_analytics,name='analytics'),
+    path('<int:org_id>/<int:proj_id>/device_detail/<int:node_id>/',device_detail,name='device_detail'),
+    path('<int:org_id>/<int:proj_id>/change_password/',change_password,name='change_password'),
+    path('organization/',update_organization_detail,name='update_organization_detail'),
+    path('project/',project,name='project'),
+    path('floor/',floor,name='floor'),
+    path('zone/',zone,name='zone'),
+    path('exhibit/',exhibit,name='exhibit'),
+    path('moderation_api/',moderation_api.as_view(),name='moderation_api'),
+    path('<int:org_id>/<int:proj_id>/show_on_ui/',show_on_ui,name='show_on_ui'),
+    path('<int:org_id>/<int:proj_id>/delete_from_ui/',delete_from_ui,name='delete_from_ui'),
+    path('latest_moderation_api/',latest_moderation_api.as_view(),name='latest_moderation_api'),
+    path('pm_selection_api/',pm_selection_api.as_view(),name='pm_selection_api'),
+    path('devices_api/',device_status_api.as_view(),name='devices_api'),
+    path('backup_mms_api/',backup_mms_api.as_view(),name='backup_mms_api'),
+    path('logout/',logout_view,name='logout'),
+    path('<int:org_id>/<int:proj_id>/museum_on_off/',museum_on_off,name='museum_on_off'),
+    #path('<int:org_id>/<int:proj_id>/<int:file_pk>/delete_node_file/',delete_node_file,name='delete_node_file'),
+    
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)+static(settings.STATIC_URL,document_root=settings.STATIC_ROOT) 

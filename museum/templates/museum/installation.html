@@ -1,0 +1,137 @@
+{% extends "base.html" %} {% load static %} {% block title %}Installation {%endblock%} {% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-title d-md-flex align-items-start justify-content-between">
+                            <h6 class="card-title">Installation List</h6>
+                        </div>
+                    </div>
+                </div>
+                {% if data %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive" tabindex="1" style="overflow: hidden; outline: none;">
+                            <table id="myTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Installation</th>
+                                        <th class="text-center">Zone</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dt in data %}
+                                    <tr>
+                                        <td class="text-center">{{dt.name}}</td>
+                                        <td class="text-center zone-{{dt.zone.id}}">{{dt.zone.name}}</td>
+                                        <td class="text-center"><button class="badge btn btn-outline-secondary installation_edit" installation="{{dt.id}}" installation_name="{{dt.name}}" installation_zone="{{dt.zone.id}}">
+                                            <i class="ti-pencil"></i> 
+                                        </button><button class="badge btn btn-outline-danger installation_delete ml-1" installation="{{dt.id}}" installation_name="{{dt.name}}">
+                                            <i class="ti-trash"></i> 
+                                        </button></td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-title d-md-flex align-items-start justify-content-between">
+                            <h6 class="card-title">Add Installation</h6>
+                        </div>
+                    </div>
+                </div>
+                <form action="" method="POST" id="installation_form">
+                    <div class="row">
+                        {% csrf_token %}
+                        <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.name.label}}</label> {{form.name}}
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.zone.label}}</label> {{form.zone}}
+                        </div>
+                         <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.tag.label}}</label> {{form.tag}}
+                        </div>
+                         <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.attraction.label}}</label> {{form.attraction}}
+                        </div>
+
+                    </div>
+                    <input type="hidden" disabled id="installation_id" name="id" value="">
+                    <input type="hidden" disabled id="installation_action" name="action" value="">
+                </form>
+                <button id="submit" class="btn btn-primary">Add</button>
+                <button id="add_new" class="btn btn-primary">Add New</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--  -->
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+<!-- Bootstrap 4 and responsive compatibility -->
+<script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+
+<script>
+    var tb;
+    $(document).ready(function() {
+        tb = $('#myTable').DataTable();
+        // var zons = [... new Set(tb.columns(1).data()[0])]
+        // tb.columns(1).search('Reception',true,false).draw()
+        // tb.columns(1).search('',true,false).draw()
+        $("#add_new").hide();
+        $("#add_new").click(function() {
+            $("#installation_id").prop("disabled", true);
+            validate_submit()
+        });
+        $("#submit").click(function() {
+            validate_submit()
+        });
+        $(".installation_edit").click(function() {
+            //installation_zone
+            $("#id_name").val($(this).attr("installation_name"))
+
+            $("#id_zone").val($(this).attr("installation_zone"))
+            $("#installation_id").val($(this).attr("installation"))
+            $("#installation_id").removeAttr("disabled")
+            $("#installation_action").val("UPDATE")
+            $("#installation_action").removeAttr("disabled")
+            $("#submit").text("Update");
+            $(this).parent().addClass("active")
+            $("#add_new").show();
+        });
+        $(".installation_delete").click(function() {
+            $("#id_name").val($(this).attr("installation_name"))
+            $("#installation_id").val($(this).attr("installation"))
+            $("#installation_id").removeAttr("disabled")
+            $("#installation_action").val("DELETE")
+            $("#installation_action").removeAttr("disabled")
+            validate_submit()
+        })
+    })
+
+    function validate_submit() {
+        if ($("#id_name").val().trim() == "") {
+            toastr.error("Enter installation name")
+            return false
+        }
+        $("#installation_form").submit()
+    }
+</script>
+{% endblock %}

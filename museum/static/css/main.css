@@ -1,0 +1,85 @@
+.drag-input {
+  height: 150px !important;
+}
+
+.device-checkbox {
+  height: 18px !important;
+  width: 18px !important;
+}
+
+.content-filters {
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+}
+
+.command_log_table_msg {
+  white-space: normal !important;
+}
+
+.chart-dashboard {
+  background: #fff;
+  width: 100% !important;
+  height: auto;
+}
+
+.myTable {
+  overflow-x: hidden !important;
+}
+
+.model {
+  position: fixed;
+  z-index: 1;
+}
+
+.bg-online {
+  /* border-color: #c8f3d8e0 !important; */
+  border: 2px solid #00ff22 !important;
+}
+
+.bg-offline {
+  /* border-color: #ffcfcf !important; */
+  border: 2px solid #fc0303 !important;
+}
+
+.control-btn {
+  background: none;
+  border: none;
+}
+
+.fix-alert {
+  position: fixed !important;
+  z-index: 1;
+}
+
+.g-search {
+  width: 50vw;
+  display: block;
+  margin-left: 10vw;
+  margin-right: 10vw;
+}
+.alert-pop {
+  position: fixed;
+  top: 90vh;
+  left: 80vw;
+  z-index: 10000 !important;
+}
+
+.border_bottom {
+  border-bottom: #fc0303 !important;
+}
+
+.mute_btn {
+  color: blue;
+  transition: all 0.5s ease;
+}
+
+.input_v {
+  writing-mode: bt-lr !important; /* IE */
+  -webkit-appearance: slider-vertical !important; /* Chromium */
+  /* -webkit-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  transform: rotate(270deg);
+  position: relative;
+  width: 10px;
+  height: 150px !important; */
+}

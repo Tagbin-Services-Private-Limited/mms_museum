@@ -1,0 +1,4 @@
+/media
+*.pyc
+/museum/migrations
+!/*.pyc

@@ -1,0 +1,23 @@
+.form-control-user-select {
+    font-size: .8rem;
+    border-radius: 10rem;
+    height: 4em;
+}
+
+body {
+    font-size: .8rem !important;
+}
+
+
+/* .milestatusform {
+    width: 36%;
+} */
+
+.white {
+    color: white
+}
+
+.modal-backdrop.show {
+    width: 160vw !important;
+    height: 160vh !important;
+}

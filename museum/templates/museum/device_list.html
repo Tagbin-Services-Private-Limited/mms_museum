@@ -1,0 +1,882 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Device List
+{% endblock %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{% static 'vendors/dataTable/dataTables.min.css' %}"
+  type="text/css"
+/>
+
+<!-- online cdns for react -->
+<script
+  src="{% static 'js/react_local/react.development.js' %}"
+  crossorigin
+></script>
+<script
+  src="{% static 'js/react_local/react-dom.development.js' %}"
+  crossorigin
+></script>
+<script src="{% static 'js/react_local/babel.js' %}"></script>
+<!-- end online cdns for react -->
+<script type="text/babel">
+    // import TableRow from "./components/tableRow.js";
+
+    // import { React, useState, useEffect } from "react";
+
+
+    // const runFunc =() =>{
+    //   send_command();
+    // }
+
+    var dev = [];
+    var floor_id;
+    var zone_id;
+    var single_node_id;
+
+    function MyVerticallyCenteredModal({configData, configDevice, setConfigDevice, configure_device, zone, configure_floor, exhibit, configure_zone,modalShow, setModalShow, onClickOutside}) {
+
+    const handleFloor = (e) =>{
+      floor_id = e.target.value;
+      console.log('done');
+    }
+
+
+
+     let ref = React.useRef(null);
+
+  const handleClickOutside = (event) => {
+    if (ref.current && !ref.current.contains(event.target)) {
+      onClickOutside && onClickOutside();
+    }
+  };
+
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+    };
+  });
+
+
+
+    const clearModel = () =>{
+      setConfigDevice({
+        name: '',
+        heartbeat: null,
+        floor: null,
+        zone: null,
+        exhibit: null
+      })
+    }
+    // console.log(configData.id);
+    const deviceId = () =>{
+      single_node_id = configData.id;
+
+      // setConfigDevice({
+      //   ...configDevice,
+      //   id: configData.id,
+      // })
+    }
+
+    const styleModel = {
+        position: 'fixed',
+        zIndex: '1',
+        //  'background-color': 'rgba(0,0,0,0.4)',
+        //   width: '100%',
+        //   height: '100%',
+
+        left: '25%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        border: '1px solid #888',
+      };
+    // console.log(zone);
+    return (
+
+      <div  className="row" >
+        <div className="col-md-12" >
+          <div className="card d-flex justify-content-center" style={styleModel}>
+            <div className="card-body" ref={ref}>
+              <div
+
+                className="
+                  card-title
+                  d-md-flex
+                  align-items-start
+                  justify-content-between
+                "
+              >
+
+              <div className='col-12'>
+                <div className='row'>
+                <div className='col-6'>
+                <h6 className="card-title">
+                  Detail of Device:  <span id="node_name">{configData.name}</span>
+                </h6>
+                </div>
+                <div className='col-6 text-right'>
+                <i className="fa fa-times font" onClick={()=>{setModalShow(false);
+                clearModel();}} aria-hidden="true"></i>
+                </div>
+                </div>
+              </div>
+              </div>
+              <div>
+                <h6 className="card-title">
+                  <b>Unique Code:- </b><span id="node_name">{configData.unique_reg_code}</span>
+                </h6>
+              </div>
+              <div>
+                <h6 className="card-title">
+                  <b>IP:- </b><span id="node_name">{configData.ip}</span>
+                </h6>
+              </div>
+              <div>
+                <h6 className="card-title">
+                  <b>Mac Address:- </b><span id="node_name">{configData.mac_addr}</span>
+                </h6>
+              </div>
+
+
+
+              <hr />
+              <h6 className="card-title">
+                Configure Device<span id="node_name"></span>
+              </h6>
+              <form>
+              <div className="row">
+                <div className="col-12 my-2">
+                  <label>Device Name:</label>
+                  <input
+                  placeholder={configData.name}
+                  className='form-control'
+                    id="device_name_config"
+                    type="text"
+                    name="device_name"
+                    value={configDevice.name}
+                    onChange={e => {setConfigDevice({...configDevice, name: e.target.value})
+                  deviceId();}}
+                  required={true}
+                  />
+                  <input
+                  className='form-control'
+                    id="device_id_config"
+                    type="hidden"
+                    name="device_name"
+                    value=""
+                    // onChange={}
+                    required={true}
+                  />
+                </div>
+                <div className="col-6 my-2">
+                  <label>Hearbeat Rate (in seconds):</label>
+                  <input className='form-control' id="heart_beat_config" type="number" onChange={e => {setConfigDevice({
+                    ...configDevice,
+                    heartbeat: e.target.value,
+                  })}}
+                  required={true}/>
+                </div>
+                <div className="col-6 my-2">
+                  <label>Floor:</label>
+                  <select className='form-control' id="floor_id_config" onChange={e => {
+                    floor_id = e.target.value;
+                    setConfigDevice({
+                    ...configDevice,
+                    floor: e.target.value,
+                  });
+                  configure_floor();
+                   }} required={true}>
+                    <option value="" selected={true} disabled={true}>Select a Floor</option>
+                    {% for i in floor %}
+                    <option value="{{i.pk}}">{{i.name}}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div className="col-6 my-2">
+                  <label>Zone:</label>
+                  <select className='form-control' id="zone_id_config" onChange={e => {
+                    zone_id = e.target.value;
+                    setConfigDevice({
+                    ...configDevice,
+                    zone: e.target.value,
+                  })
+                configure_zone();}}  required={true}>
+                   <option value="" selected={true} disabled={true}>Select a zone</option>
+                    {zone?zone?.map((v) =>
+                      <option value={v.id}>{v.name}</option>
+                    ):''}
+                  </select>
+                </div>
+                <div className="col-6 my-2">
+                  <label>Exibit:</label>
+                  <select className='form-control' id="exhibit_id_config" onChange={e => {setConfigDevice({
+                    ...configDevice,
+                    exhibit: e.target.value,
+                  })}}>
+                    <option value="" selected={true} disabled={true}>Select a Exhibit</option>
+                    {exhibit?exhibit?.map((v) => <option value={v.id}>{v.name}</option>):''}
+                  </select>
+                </div>
+              </div>
+
+              <button
+                // onclick="configure_device();"
+                className="btn btn-primary"
+                id="detail_form_button"
+                data-dismiss="modal"
+                onClick={(e) => {configure_device();
+                setModalShow(false);}}
+                type='submit'
+              >
+                Submit
+              </button>
+              </form>
+              </div>
+              </div>
+              </div></div>
+
+    )
+  }
+
+
+    function TableRow({
+      sno,
+      name,
+      time,
+      ip,
+      exhibit,
+      status,
+      command,
+      id,
+      is_config,
+      unique_reg_code,
+      mac_addr,
+      checkedAll,
+      commandId,
+      deviceArr,
+      onCommandId,
+      setDeviceArr,
+      send_command,
+      modalShow,
+      setModalShow,
+      configData,
+      setConfigData,
+      version
+    }) {
+      const selectref = React.useRef();
+      const handleCheck = (e, ) => {
+        if (e.target.checked == true) {
+
+          setDeviceArr([...deviceArr, parseInt(e.target.value)]);
+        }
+        else{
+          var filterArr = deviceArr.filter((item) => item != e.target.value);
+          setDeviceArr(filterArr);
+        }};
+
+      React.useEffect(()=>{
+
+    },[])
+      const setData =()=>{
+        setConfigData({
+          name: name,
+          unique_reg_code: unique_reg_code,
+          mac_addr: mac_addr,
+          ip: ip,
+          id: id,
+        })
+      }
+
+        const handleDevice = (command, dev) =>{
+              send_command(command, dev);
+              selectref.current.value = "";
+            }
+
+
+      const handleCommand = (e) => {
+        setDeviceArr([parseInt(e.target.name)])
+        onCommandId(e.target.value);
+      };
+
+      const myStyle = {
+        display: "none",
+      };
+
+     var url = '/{{org.pk}}/{{proj.pk}}/device_detail/'+id;
+
+      return (
+        <>
+            <tr key={id}>
+            <td className="">
+              <input
+                className="device-checkbox"
+                type="checkbox"
+                value={id}
+                checked={deviceArr.includes(id) }
+                onChange={handleCheck}
+              />
+              </td>
+            <td className='text-center'>{sno +1}</td>
+            <td className="text-center"><a href={url}>{name}</a></td>
+            <td className="text-center">{version}</td>
+            <td className="text-center">{getDateTime(time)}</td>
+            <td className="text-center">{ip}</td>
+            <td className="text-center">{exhibit}</td>
+            <td className="text-center">
+              {is_config == true ? status == "offline" ? (
+                <span className="badge badge-danger">Offline</span>
+              )  : (
+                <span className="badge badge-success">Online</span>
+              ):  (
+                <span className="badge badge-warning">Not Configured</span>
+              )}
+            </td>
+            <td className="text-center">
+              <div className="text-center">
+                {is_config == true? status == "online" ? (
+                   <>
+                    <select
+                      name={id}
+                      className="form-control mr-2 d-inline  col-6"
+                      onChange={handleCommand}
+                      id={id}
+                      ref={selectref}
+                    >
+                      <option value="" selected={true} disabled={true}>
+                        Select Command
+                      </option>
+
+                      {command?.map((k) => {
+                        return (
+                          <option key={k.id} value={k.id}>
+                            {k.name}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    <button
+                      className="btn btn-info mb-1 d-inline"
+                      onClick={() => handleDevice()}
+                    >
+                      Send
+                    </button>
+                    </>): (
+                  <button className="btn btn-success" onClick={() => handleDevice(command.filter(v => v.name == 'TurnOn')[0].id, [parseInt(id)])}>Turn On</button>
+                ) :(
+                    <button
+                      value={id}
+                      onClick={()=>{setModalShow(!modalShow);
+                      setData();}}
+                      className="btn btn-warning"
+                      name='cofigButton'
+                      // data-toggle="modal" data-target="#device_detail_modal"
+
+                    >
+                      Configure
+                    </button>
+                  )
+                 }
+              </div>
+            </td>
+          </tr>
+        </>
+      );
+    }
+
+    function App() {
+
+      // const location = Router.useLocation();
+
+      const [devices, setDevices] = React.useState();
+      const [commandId, setCommandId] = React.useState("");
+      const [deviceArr, setDeviceArr] = React.useState([]);
+      const [checked, setChecked] = React.useState(false);
+
+      const [filterZone, setFilterZone] = React.useState([]);
+
+      const [configResult, setConfigResult] = React.useState('');
+      const [search, setSearch] = React.useState("");
+
+      const [configData, setConfigData] = React.useState({
+        unique_reg_code: '',
+        // mac_addr: '',
+        ip: '',
+        name: '',
+        mac_addr: '',
+        id: '',
+      })
+
+      const [configDevice, setConfigDevice] = React.useState({
+        name: '',
+        heartbeat: null,
+        floor: null,
+        zone: null,
+        exhibit: null
+      })
+
+      const [zone, setZone] = React.useState('');
+      const [exhibit, setExhibit] = React.useState('');
+
+      const [modalShow, setModalShow] = React.useState(false);
+
+      //Filter states
+      const [status, setStatus] = React.useState('');
+      const [floor, setFloor] = React.useState([]);
+      const [filZone, setFilZone] = React.useState([]);
+      const [filExhibit, setFilExhibit] = React.useState([]);
+
+      const statusRef = React.useRef()
+      statusRef.current = status;
+
+      const zoneRef = React.useRef()
+      zoneRef.current = filZone;
+
+      const exhibitRef = React.useRef()
+      exhibitRef.current = filExhibit;
+
+      const refOpen = React.useRef();
+      const selectref = React.useRef();
+      const floorRef = React.useRef()
+      floorRef.current = floor;
+
+      const handleFloor = (e) => {
+        setFloor([parseInt(e.target.value)]);
+        filter_data1([parseInt(e.target.value)], filZone, filExhibit, status);
+      }
+
+      const handleZone = (e) =>{
+        setFilZone([parseInt(e.target.value)]);
+        filter_data1(floor, [parseInt(e.target.value)], filExhibit ,status);
+      }
+
+      const handleExhibit = (e) =>{
+        setFilExhibit([parseInt(e.target.value)]);
+        filter_data1(floor, filZone, [parseInt(e.target.value)] ,status);
+      }
+
+      const handleStatus =(e)=>{
+        setStatus(e.target.value);
+        console.log(status);
+        filter_data1(floor, filZone, filExhibit, e.target.value);
+      }
+
+      const handleSearch = (e) =>{
+        setSearch(e.target.value.toLowerCase());
+        filter_data1(floor, filZone, filExhibit, status, e.target.value);
+      }
+
+      const [comBtn, setCombtn] = React.useState(true);
+
+      const urlSearchParams = new URLSearchParams(window.location.search);
+      const params = Object.fromEntries(urlSearchParams.entries());
+      const statusDash = params.status;
+
+
+      var interval;
+      React.useEffect(() => {
+       filter_data1(floor, filZone, filExhibit, status)
+       interval =  setInterval(function(){ filter_data1(floorRef.current, zoneRef.current, exhibitRef.current, statusRef.current);}, 5000);
+       return
+         clearInterval(interval);
+
+      },[deviceArr]);
+
+      function filter_data1(floor,filZone, filExhibit, status, search) {
+      // console.log("hello");
+      //  console.log(floor);
+          let data = {};
+         data['floor_id'] = floor;
+         data['zone_id'] = filZone;
+         data['exhibit_id'] = filExhibit;
+         data["name"] = search;
+
+
+      data["status"] = status?status:statusDash;
+        console.log(data);
+        $.ajax({
+          data: data,
+          success: function (result) {
+            console.log(result);
+            setDevices(result)
+          },
+
+          error:function (error){
+            console.log(error);
+          }
+        });
+
+      }
+
+      // console.log(configDevice);
+      // configure device ajax
+
+      console.log(single_node_id)
+
+      function configure_device() {
+
+      let data = {};
+          data["single_node_id"] = single_node_id;
+          data["name"] = configDevice.name;
+          data["heartbeat_rate"] = configDevice.heartbeat;
+
+          data["floor"] = configDevice.floor;
+          data["zone"] = configDevice.zone;
+          data["exhibit"] = configDevice.exhibit;
+
+          console.log(data);
+          $.ajax({
+            type: "POST",
+            data: data,
+            success: function (result) {
+              console.log(result);
+              setConfigResult(result.status);
+              setTimeout(()=>{setConfigResult('')}, 3000);
+              single_node_id = '';
+              setConfigDevice({
+        name: '',
+        heartbeat: null,
+        floor: null,
+        zone: null,
+        exhibit: null
+      })
+            },
+          });
+        }
+
+
+        function configure_floor() {
+  let data = {};
+
+  data["floor_id"] = floor_id;
+
+  console.log(data);
+        $.ajax({
+          type: "POST",
+          data: data,
+          success: function (result) {
+            console.log(result)
+            setZone(result.data)
+            //  setFilterZone(result.data);
+             floor_id='';
+          },
+        });
+      }
+
+      function configure_zone() {
+        let data = {};
+
+        data["zone_id"] = zone_id;
+
+        console.log(data);
+        $.ajax({
+          type: "POST",
+          data: data,
+          success: function (result) {
+            console.log(result);
+            setExhibit(result.data);
+
+            zone_id='';
+          },
+        });
+      }
+
+       // end configure device ajax
+      console.log(deviceArr);
+
+      function send_command(command, devArr){
+
+        let data = {};
+        data["node_id"] = devArr? devArr:deviceArr;
+        data["command_id"] = command? command:commandId;
+        console.log(data);
+        $.ajax({
+          type: "POST",
+          data: data,
+          success: function (result) {
+            console.log(result);
+              setDeviceArr([]);
+              setCommandId('');
+              setChecked(false);
+              dev= [];
+              setCombtn(true);
+
+              setConfigResult(result.status);
+              setTimeout(()=>{
+                setConfigResult('')
+                selectref.current.value = "";
+              }, 3000)
+            },
+          })
+      }
+
+
+
+      const handleCheckChange = () =>{
+        if (checked == false){
+          var devArr = [];
+          devArr = devices?.data.map((v) => {if(document.getElementById("status_id").value == "offline" || statusDash == "offline"){if(v.status=='offline'){return v.id}else{return}}else{if(v.status=='online'){return v.id}else{return}}});
+          devArr = devArr.filter((v) => v!=undefined);
+          setDeviceArr(devArr);
+        }
+        else {
+          setDeviceArr([]);
+        }
+      }
+
+       const handleChecked = () => {
+        setChecked(!checked);
+
+      };
+
+        // console.log(devices);
+
+        console.log(modalShow);
+
+      return (
+        < >
+        {modalShow ?   <MyVerticallyCenteredModal id='config-model' configData={configData} configDevice={configDevice} setConfigDevice={setConfigDevice} configure_device={configure_device} zone={zone} configure_floor={configure_floor} exhibit={exhibit} configure_zone={configure_zone}  setModalShow={setModalShow} configResult={configResult} modalShow={modalShow}  onClickOutside={() => {setModalShow(false)}}/> :null}
+          <div className="card" >
+            <div className="card-body">
+
+                <div className="col-md-12">
+                  <div className="row">
+                  <div
+                    className="
+                  card-title
+                  d-md-flex
+                  align-items-start
+                  justify-content-between
+                  col-md-2
+                "
+                  >
+                    <h6 className="card-title">All Devices</h6>
+                  </div>
+                  <div className="col-md-6">
+                    <input placeholder="Search Device with Name..." className="mb-5" onChange={(e) => handleSearch(e)}/>
+                  </div>
+                  {configResult?<div className="alert alert-success text-center" role="alert">{configResult}</div>:''}
+
+                  <div className="col-12">
+                    <div className="row mb-5">
+                      <div className="col-3">
+                        <label>Floor:</label>
+                        <select
+                          id="floor_id"
+                          name=""
+                          className=""
+                          onChange={(e) =>{handleFloor(e);}}
+                        >
+                        <option value="" selected={true} disabled={true}>Select a Floor</option>
+                          {% for i in floor %}
+                          <option value="{{i.id}}">{{i.name}}</option>
+                          {% endfor %}
+                        </select>
+                      </div>
+
+                      <div className="col-3">
+                        <label>Zone:</label>
+                        <select
+                          id="zone_id"
+                          name=""
+                          className="zone"
+                          onChange={e => handleZone(e)}
+                        >
+                        <option value="" selected={true} disabled={true}>Select a Zone</option>
+                        {% for i in zone %}
+                            <option value="{{i.id}}">{{i.name}}</option>
+                        {% endfor %}
+                        </select>
+                      </div>
+                      <div className="col-3">
+                        <label>Exibit:</label>
+                        <select
+                          id="exhibit_id"
+                          name=""
+                          className="exhibit"
+                          onChange={e => handleExhibit(e)}
+                        >
+                        <option value="" selected={true} disabled={true}>Select a Exhibit</option>
+                         {% for i in exhibit %}
+                            <option value="{{i.id}}">{{i.name}}</option>
+                         {% endfor %}
+                        </select>
+                      </div>
+                      <div className="col-3">
+                        <label>Status:</label>
+                        <select
+                          id="status_id"
+                          name=""
+                          className=""
+                          onChange={e => handleStatus(e)}
+                        >
+                        <option value="" selected disabled>Select Status</option>
+                          <option value="All">All</option>
+                          <option value="online">Online</option>
+                          <option value="offline">Offline</option>
+                          <option value="not_configured">Not Configured</option>
+                        </select>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="col-md-12">
+                <div className="row">
+                  <div className="col-12" id="command_msg"></div>
+                  <div className="col-md-12">
+                    <div className="table-responsive">
+                      <div className="row">
+                        <div className="col-12 pr-0">
+                          <table
+                            id=""
+                            className="table table-striped table-bordered"
+                          >
+                            <thead className="text-center">
+                              <tr>
+                                <th className="text-center">
+                                  <input
+                                    onChange={() => {handleChecked();
+                                    handleCheckChange();}}
+                                    className="device-checkbox"
+                                    type="checkbox"
+                                    value="Select All"
+                                    checked={checked}
+                                    disabled={search !== ""? true : false}
+                                  />
+                                </th>
+                                <th className='text-center'>S No.</th>
+                                <th className="text-center">Device Name</th>
+                                <th className="text-center">Version</th>
+                                <th className="text-center">Last Seen</th>
+                                <th className="text-center">IP</th>
+                                <th className="text-center">Exibits</th>
+                                <th className="text-center">Status</th>
+                                <th className="text-center">
+                                  <select
+                                    className="d-inline col-7 mr-2"
+                                    id="multi_command"
+                                    name=""
+                                    onChange={(e) => {setCommandId(e.target.value);
+                                    setCombtn(false)}}
+                                    ref={selectref}
+                                  >
+                                  <option value="" selected={true} disabled={true}>Select Command</option>
+                                    {devices?.command?.map((k) => (
+                                      <option key={k.id} value={k.id}>{k.name}</option>
+                                    ))}
+                                  </select>
+                                  <button
+                                    className="btn btn-info mb-1 d-inline"
+                                    onClick={() => send_command()}
+                                    disabled={comBtn}
+                                  >
+                                    Send
+                                  </button>
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody id="">
+                              {devices?.data?.map((v, i) => {
+                                return (
+                                  v.name.toLowerCase().includes(search)?
+                                  <TableRow
+                                    sno={i}
+                                    key={v.id}
+                                    id={v.id}
+                                    name={v.name}
+                                    time={v.updated_at}
+                                    ip={v.ip}
+                                    exhibit={v.exhibit}
+                                    status={v.status}
+                                    command={devices.command}
+                                    is_config={v.is_config}
+                                    checkedAll={checked}
+                                    commandId={commandId}
+                                    deviceArr={deviceArr}
+                                    onCommandId={setCommandId}
+                                    setDeviceArr={setDeviceArr}
+                                    send_command={send_command}
+                                    modalShow={modalShow}
+                                    setModalShow={setModalShow}
+                                    configData={configData}
+                                    setConfigData={setConfigData}
+                                    mac_addr={v.mac_addr}
+                                    unique_reg_code={v.unique_reg_code}
+                                    version={v.version}
+                                    selectref={selectref}
+                                  />:null
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("mydiv"));
+</script>
+
+<div
+  class="modal fade"
+  id="exampleModal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <!-- <h5 class="modal-title" id="exampleModalLabel">hello</h5> -->
+        <h5>Are you sure?</h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">
+          Cancel
+        </button>
+        <form method="post">
+        <button type="submit" class="btn btn-primary" name="shutdown_all">Yes</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block content %}
+
+<div id="mydiv"></div>
+
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+<!-- Bootstrap 4 and responsive compatibility -->
+<script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/js/external_api.js' %}"></script>
+
+<script>
+  function getDateTime(date) {
+    const event = new Date(date);
+    return event.toString().split("G")[0];
+  }
+</script>
+
+{% endblock %}

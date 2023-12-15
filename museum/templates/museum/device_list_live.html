@@ -1,0 +1,128 @@
+{% extends "base.html" %} {% load static %} {% block title %}Device List {% endblock %} {% block head %}
+    <link rel="stylesheet" href="{% static 'vendors/dataTable/dataTables.min.css' %}" type="text/css"/> {% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                {% if is_error == "yes" %}
+                                    <h6 style="color:red" class="card-title">{{ message }}</h6>
+                                {% else %}
+                                    <h6 style="color:green" class="card-title">{{ message }}</h6>
+                                {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                <h6 class="card-title">All Devices</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive" tabindex="1" style="overflow: hidden; outline: none;">
+                                <table id="myTable" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th class="text-center">Unique Reg. Code</th>
+                                        <th class="text-center">IP</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Command</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for item in device_list %}
+                                        <tr>
+                                            <td>{{ item.name }}</td>
+                                            <td>{{ item.unique_reg_code }}</td>
+                                            <td>{{ item.ip }}</td>
+                                            <td>Online</td>
+                                            <td>
+                                                <div class="dropdown">
+                                                    <button class="btn btn-secondary dropdown-toggle" type="button"
+                                                            id="dropdownMenuButton" data-toggle="dropdown"
+                                                            aria-haspopup="true" aria-expanded="false">Command
+                                                    </button>
+                                                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                                        {% for command in commands %}
+                                                            <a
+                                                                    class="dropdown-item"
+                                                                    href="/mms/send_device_command/{{ item.mac_addr }}/{{ command.name }}">{{ command.name }}</a>
+
+                                                        {% endfor %}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <div class="modal fade" id="device_detail_modal" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" style="background: transparent;border: 0;margin-top: 10%;">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-title d-md-flex align-items-start justify-content-between">
+                                        <h6 class="card-title">Detail of <span id="node_name"></span></h6>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title"><b>Unique Code:- </b><span id="unique_code"></span></h6>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title"><b>IP Address:- </b><span id="ip"></span></h6>
+                                    </div>
+                                    <div>
+                                        <h6 class="card-title"><b>MAC Address:- </b><span id="mac"></span></h6>
+                                    </div>
+                                    <form method="POST" id="detail_form">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail1">{{ form.installation.label }}</label> {{ form.installation }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputPassword1">{{ form.heartbeat_rate.label }}</label> {{ form.heartbeat_rate }}
+                                        </div>
+                                        <input type="hidden" name="node" value="">
+
+                                    </form>
+
+                                    <button type="button" class="btn btn-primary" id="detail_form_button">Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} {% block script %}
+    <script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+    <!-- Bootstrap 4 and responsive compatibility -->
+    <script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'assets/js/external_api.js' %}"></script>
+{% endblock %}

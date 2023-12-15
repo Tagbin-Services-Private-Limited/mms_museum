@@ -1,0 +1,84 @@
+{% extends "base.html" %} {% load static %} {% block title %}Device List {% endblock %} {% block head %}
+    <link rel="stylesheet" href="{% static 'vendors/dataTable/dataTables.min.css' %}" type="text/css"/> {% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                {% if is_error == "yes" %}
+                                    <h6 style="color:red" class="card-title">{{ message }}</h6>
+                                {% else %}
+                                    <h6 style="color:green" class="card-title">{{ message }}</h6>
+                                {% endif %}
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <p>Device Name:- <b> {{ node.name }} </b></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>Unique Reg. Code:- <b> {{ node.unique_reg_code }} </b></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>IP:- <b> {{ node.ip }} </b></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>Installation:- <b> {{ node.name }} </b></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>MAC Addr:- <b> {{ node.mac_addr }} </b></p>
+                        </div>
+                        <div class="col-md-3">
+                            <p>Port:- <b> {{ node.port }} </b></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p>Port:- <b> {{ node.auth_token }} </b></p>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 30px">
+                        <div class="col-md-12">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                <h6 style="margin-bottom: 1rem;" class="card-title">Device Console</h6>
+                            </div>
+                            <div class="row">
+                                <iframe id="encoder_iframe" height=500 width="100%" src="http://127.0.0.1:8888/?hostname=smhj.anaws.me&username=ubuntu&password=&filename=c9&filedata=LS0tLS1CRUdJTiBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0KYjNCbGJuTnphQzFyWlhrdGRqRUFBQUFBQkc1dmJtVUFBQUFFYm05dVpRQUFBQUFBQUFBQkFBQUJsd0FBQUFkemMyZ3RjbgpOaEFBQUFBd0VBQVFBQUFZRUE4Z25qQUFXSEhZODUxZ1NlYTBzTHBseUNBU2lDb1ZtckpZL1J2VWR5bVlhRFVPSmZEZnJhCkF3ckVxU3JuS21udWM1VE9uKzN0UThxNDhHTEZXRkdVZGpLaHlMejR4RVkxenFYTEd3U3ZHZmFzOVM4bXQwUXJBM3UrcEIKbXFxVENzeE10cFhPZWhQR1JrU21DK3d2V0cxWXpRcW1ZaTFnUVZFS3V5NWd5aW9ieEJrc1cwYkdjeTkwU1J1RzFCZmdGOApEbGUyNEVOUWVRT3hvcWM2S25JTkc3UWQvcVpNZFVkTVJPaXVzcDNVeWJDMktRa2ZhaHlVS0E0ajRQcnVkcUx0UEEzcWE5Ck92NExLSkhRVDVFZ0I3cWpzN2NqWHdscWRkRXlvbHNXZG4zampPcDA1SVhrWUp2UHA5NEdHb1JmWUs0UGhIcmtaZ3orWWQKbUR4cEtXbDVWMFk4RXZCQUF2bWYzQTJ1UnRmNDhnWlFIdzBxdFdiU3A1cEhRNDg5QU1FTFJRTHdBTm1NYldoL3NDeWRSeQpZcGZ2TFdYVkNPWlJtQUo1c1MvYlBXaVFTK04zWC8vMEgzV2ZYWnRzQmpsdzY1a2MyazZ3OThMTlBheVNWeEZWTkhwTS8vCjdjanJNS2x2TWZ3alUyK0trVVJZZ2RRTmVYVEpYNXlJeWg2VE55REJBQUFGbU5mdml6RFg3NHN3QUFBQUIzTnphQzF5YzIKRUFBQUdCQVBJSjR3QUZoeDJQT2RZRW5tdExDNlpjZ2dFb2dxRlpxeVdQMGIxSGNwbUdnMURpWHczNjJnTUt4S2txNXlwcAo3bk9VenAvdDdVUEt1UEJpeFZoUmxIWXlvY2k4K01SR05jNmx5eHNFcnhuMnJQVXZKcmRFS3dON3ZxUVpxcWt3ck1UTGFWCnpub1R4a1pFcGd2c0wxaHRXTTBLcG1JdFlFRlJDcnN1WU1vcUc4UVpMRnRHeG5NdmRFa2JodFFYNEJmQTVYdHVCRFVIa0QKc2FLbk9pcHlEUnUwSGY2bVRIVkhURVRvcnJLZDFNbXd0aWtKSDJvY2xDZ09JK0Q2N25haTdUd042bXZUcitDeWlSMEUrUgpJQWU2bzdPM0kxOEphblhSTXFKYkZuWjk0NHpxZE9TRjVHQ2J6NmZlQmhxRVgyQ3VENFI2NUdZTS9tSFpnOGFTbHBlVmRHClBCTHdRQUw1bjl3TnJrYlgrUElHVUI4TktyVm0wcWVhUjBPUFBRREJDMFVDOEFEWmpHMW9mN0FzblVjbUtYN3kxbDFRam0KVVpnQ2ViRXYyejFva0V2amQxLy85QjkxbjEyYmJBWTVjT3VaSE5wT3NQZkN6VDJza2xjUlZUUjZUUC8rM0k2ekNwYnpIOApJMU52aXBGRVdJSFVEWGwweVYrY2lNb2VremNnd1FBQUFBTUJBQUVBQUFHQkFJTloxalUyeXNMQjdaTTE0bnM3dU5ESnQwCnZGbms3T0NORlRvWEZsQ3M1Q2I1VS9wSEpEeG5pTUtYbmM3S0xaNWl3WGY2TFBUa25TQkZlQVlyU3hZUzViLyt5ZWtTcUQKSjhSRHVWdXFTUlNBQ0JEdlM4VjlXeEtDMzB6VEdRakVmNTQwL2JNTGlUYnJESHBJMG4yZkhWTmJIZ3E3YndCU0t0Um5PYQprYkJrOWJpUUtNQklRbjVVTEhsWVZPMVpINllFYXdWM0NSVjJTMUdudTQ0Um9UMXdWSDFGZFVESDVBK1NVVVdXcFp1UmJUCnJhZkxhWjcrYjNEbGE1YzIxcDdQZjMwNlBNVWRQeS9oTkxnN3A2cjZ5ZlNLVEgzcldUQkNVMlBnWjByUktXVStsMzV3ckYKc1hIS0x2K2M2dVlKemx6MFhYZU81UXE3b2Q0VUF2NGlQL05ScGlnU011WlNrMFdWblNneWJweWF5VGpDWnVUVU5xSm1TVQpXcHhKZTNxdzZHSEgxUXVaNjB2WXlkNG1leGJnL2VCeGtaTGtPMU9BeWdzcnZPaU5kY1p3SmlDcERnVmk1NUZxWWczZlFRCithYUhSWUtscEtiWW9JYTFhSjdFRENLRXh2Rnd4T1ErMnBBL1Vlb1Y0YWVmQ3BlK1hiOE5Tc0tFU2w4ZlJWaE9qbG9RQUEKQU1FQXZJY1BxZ0RCYnJybjh5eDBnRnpQT245NnRlY1NlbGpLSzdrK1plV1Fqb3RBbGVtYlp3VEx3NTBzZHNUUHFGRzFhTQpTeVpQbFNzU1NhZlRBT3BIbjZnSTdtaUZkYlFtTGYweGg3b3N3dm1odlpGQWRpdkdxWm1HQ0VueG5ZeUs0Z0V2NmdLTGxwCi9BelRsSWtsRWVYM2kzS3lFdXJPWGNwQ0loVXZ1UjN5dFVMK0JOd0pHNjFWeWJ6QURIeGN5blRnT0ZDNjJ4VjEyUFhjS0oKUlBja3l4L0tWcUFhbGxMM1FBaVNydUNjSmYxUEI0eFpJZFhkamRFdnp5WndpWEJleE5BQUFBd1FEOFdBNEMvdnZKZ0dTawpKWElNdkcvQ3gwNjEwcDVuamhMbEcwS3plNmhzOWN1dE5kbzJzZVcrR1hDaXpxOXV3ZDBtcTdxTCtOTE5hNFg4bVBWQytXCmlxeUthb3ZRVkFTRWJ4blB1MktSNDRMY01RVEFyT0dQT0tjMjR1WWV1aXp2L0NjVE13dDFma2FrNjllVXdGa2s5QWVPaXcKUUNRUWJveUkwamQrbnl6ZEprdklyTVJmSmJiMHl1dnRjRzk5RjA5T0FDc1pMalhhc0oyR3NrWENuUVJMQW51ajZOc3lRbgpsY2NUOERsNHZpTWF3cVFtY0U3VS9KN0hLTm1ObjJtbjBBQUFEQkFQV0xuQUhxVnBGTVIrZDVJWXBMT1Nla1NZQXI3cm4yCndiL3VscXZOM0ZUeUJBVTQzMlM0cWlaQzg3Wkx0Q0tFK3htdUYydmFrMDA1ZkJVd0x2V3NWUkl2WTZhakRhMEVLWVlQT3kKdTMvZEg2azg4MVRQcU9PTlprSXZpNjlhTEloUlBPZ3JPTkVxMk92YjhQY1FEaDR2VWlRZytNQjhBYVExUjE5MHJrdFVacwpKNmZCaW1rS05POFFyTDZUK3pFL2pVakxJNE9QdGFBcHZIODBraHFmZ3BuL2VVdG4rS1QwV0FxSGRrNzdLZFdPbG9YV2pzCnhzTTl3MkVHQVZiWHZ1bFFBQUFCNXdZWGRoYmtCUVlYZGhibk10VFdGalFtOXZheTFCYVhJdWJHOWpZV3dCQWdNPQotLS0tLUVORCBPUEVOU1NIIFBSSVZBVEUgS0VZLS0tLS0=">
+                                </iframe>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row" style="margin-top: 20px;">
+                        <div class="col-md-12">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+{% endblock %} {% block script %}
+    <script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+    <!-- Bootstrap 4 and responsive compatibility -->
+    <script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'assets/js/external_api.js' %}"></script>
+    <script src="{% static 'js/xterm.min.js' %}"></script>
+    <script src="{% static 'js/xterm-addon-fit.min.js' %}"></script>
+
+    <script>
+        wssh = new wssh()
+        alert('ehhlo')
+        wssh.connect()
+        alert('ehhlo')
+    </script>
+
+
+{% endblock %}

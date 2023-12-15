@@ -1,0 +1,49 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Project
+Selection {%endblock%} {% block head %}
+<!-- endter the head links here -->
+{% endblock %} {% block content %}
+
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">DevShow</h6>
+      <div id="alert" class="text-center"></div>
+      <div class="col-md-3 my-3">
+       <select name="" id="show_lang">
+         <option value="" disabled selected>Select Language</option>
+         <option value="english">English</option>
+         <option value="hindi">Hindi</option>
+        </select>
+      </div>
+      <div class="row mt-5 justify-content-md-center">
+            < class="btn btn-sm btn-primary">
+                0-30%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #79DD7A; border-color: #79DD7A;" class="btn btn-sm btn-primary">
+                30%-%60
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FCFC98; border-color: #FCFC98;" class="btn btn-sm btn-primary">
+                60%-90%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FC6962; border-color: #FC6962;" class="btn btn-sm btn-primary">
+                90%-100%
+              </a>
+            </div>
+          </div>      
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+
+{% endblock %} {% block script %}
+<script>
+
+</script>
+{% endblock %}

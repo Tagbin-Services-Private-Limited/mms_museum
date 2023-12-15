@@ -1,0 +1,156 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Project
+Selection {%endblock%} {% block head %}
+<!-- endter the head links here -->
+{% endblock %} {% block content %}
+
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">DevShow</h6>
+      <div id="alert" class="text-center"></div>
+      <div class="col-md-3 my-3">
+       <select name="" id="show_lang">
+         <option value="" disabled selected>Select Language</option>
+         <option value="english">English</option>
+         <option value="hindi">Hindi</option>
+        </select>
+      </div>
+      
+
+      <!-- Project Table  -->
+      <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th class="text-center">Name</th>
+            <th class="text-center">Description</th>
+            <th class="text-center col-6">Start Show</th>
+          </tr>
+        </thead>
+        <tbody id="device_list">
+          {% for i in show %}
+          <tr>
+            <td class="text-center">{{i.name}}</td>
+            <td class="text-center">{{i.description}}</td>
+            <td class="text-center col-6">
+                  <button
+                    class="btn btn-primary m-2"
+                    
+                    onclick="startShow('{{i.id}}')">
+                    Start Show
+                  </button>
+                  <button
+                    class="btn btn-primary m-2"
+                    
+                    onclick="abortShow('{{i.id}}')">
+                    Terminate Show
+                  </button><button
+                    class="btn btn-primary m-2"
+                    
+                    onclick="playShow('{{i.id}}')">
+                    Play
+                  </button>
+                  <button
+                    class="btn btn-primary m-2"
+                    
+                    onclick="pauseShow('{{i.id}}')">
+                    Pause
+                  </button>
+                </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+
+{% endblock %} {% block script %}
+<script>
+  // let show_req;
+  console.log(document.getElementById("show_lang").value);
+  function startShow (show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_start'] = show_id;
+    data['show_language'] = document.getElementById("show_lang").value;
+
+    console.log(data);
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });
+  }
+
+  function abortShow(show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_abort'] = show_id;
+    data['show_language'] = document.getElementById("show_lang").value;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });  
+  }
+
+  function playShow (show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_play'] = show_id;
+    data['show_language'] = document.getElementById.value;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });
+  }
+
+ function pauseShow(show_id){
+    console.log(show_id);
+    
+    var data={}
+    data['show_id_pause'] = show_id;
+    data['show_language'] = document.getElementById.value;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });  
+  }
+
+
+
+</script>
+{% endblock %}

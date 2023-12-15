@@ -1,0 +1,164 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Software
+Update{%endblock%} {% block head %} {% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card mt-2">
+      <div class="card-body">
+        <h6 class="card-title">Software Update</h6>
+        <p id="tcp_status" class="text-center text-success"></p>
+        <p id="loading" style="display: none" class="text-center text-success">
+          Loading...
+        </p>
+
+        <div class="px-3">
+          <div class="row">
+            <div class="col-3">
+              <div class="form-group">
+                <label for="">Select Device:</label>
+                <select
+                  class="form-control js-example-basic-multiple"
+                  name="node_id"
+                  id="device_name"
+                  onchange="enable_upload();"
+                  multiple
+                >
+                  <!-- <option value="" disabled selected>Select Device</option> -->
+                  {% for i in devices %}
+                  <option value="{{i.pk}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+                <small"><small id="version"></small>
+              </div>
+            </div>
+            <div class="col-9 content-filters">
+              <div class="row">
+                <div class="form-group col-4">
+                  <label for="">Floor:</label>
+                  <input disabled class="" name="" id="floor"/>
+                </div>
+                <div class="form-group col-4">
+                  <label for="">Zone:</label>
+                  <input disabled class="" name="" id="zone"/>
+                </div>
+                <div class="form-group col-4">
+                  <label for="">Exhibits:</label>
+                  <input disabled class="" name="" id="exhibit"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="file-upload-wrapper my-2">
+              <input
+                onchange="enable_upload();"
+                name="device_software"
+                type="file"
+                id="device_software"
+                class="drag-input"
+                multiple
+              />
+            </div>
+            <button
+              class="btn btn-primary"
+              onclick="upload_software(); enable_upload();"
+              id="upload_button"
+              disabled
+            >
+              Software Upload
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block script %}
+
+<script>
+  $(document).ready(function () {
+    $(".js-example-basic-multiple").select2({
+      placeholder: "Select a device",
+    });
+  });
+
+  const upload_software = () => {
+    var nodeId_str = $("#device_name").val();
+    // var nodeId_num;
+    // for (var i = 0; i < nodeId_str.length; i++) {
+    //   nodeId_num[i] = parseInt(nodeId_str[i], 10);
+    // }
+    console.log(nodeId_str);
+    var data = new FormData();
+    $.each(nodeId_str, function (i, node) {
+      data.append("node_id", node);
+    });
+    $.each($("#device_software")[0].files, function (i, file) {
+      data.append("device_software", file);
+    });
+
+    console.log(data);
+    $.ajax({
+      type: "POST",
+      data: data,
+      processData: false,
+      cache: false,
+      contentType: false,
+      success: function (result) {
+        document.getElementById("tcp_status").innerHTML = result.status;
+      },
+    });
+
+    document.getElementById("device_software").value = [];
+  };
+
+  $(document)
+    .ajaxStart(function () {
+      $("#loading").show();
+    })
+    .ajaxStop(function () {
+      $("#loading").hide();
+    });
+
+  function get_version() {
+    var data = {};
+
+    data["node_id"] = $("#device_name").val();
+
+    $.ajax({
+      data: data,
+      success: function (result) {
+        document.getElementById("version").innerHTML =
+          `<strong>Current Version :  </strong>` + result.version;
+      },
+    });
+  }
+
+  function enable_upload() {
+    if ($("#device_software").val() == "" || $("#device_name").val() == null) {
+      $("#upload_button").attr("disabled", true);
+    } else {
+      $("#upload_button").attr("disabled", false);
+      console.log("done");
+    }
+
+    var data = {};
+    var id = $("#device_name").val();
+    data["node_id"] = id[0];
+
+    $.ajax({
+      type: "GET",
+      data: data,
+      success: function (result) {
+        console.log(result);
+
+       $("#floor").val(result.floor);
+        $("#zone").val(result.zone);
+        $("#exhibit").val(result.exhibit);
+      },
+    }); 
+  }
+</script>
+{% endblock %}

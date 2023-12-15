@@ -1,0 +1,136 @@
+{% extends "base.html" %} {% load static %} {% block title %}Tag {%endblock%} {% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-title d-md-flex align-items-start justify-content-between">
+                            <h6 class="card-title">Tag List</h6>
+                        </div>
+                    </div>
+                </div>
+                {% if data %}
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="table-responsive" tabindex="1" style="overflow: hidden; outline: none;">
+                            <table id="myTable" class="table table-striped table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">Tag</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for dt in data %}
+                                    <tr>
+                                        <td class="text-center">{{dt.name}}</td>
+                                        <td class="text-center">{{dt.status}}</td>
+                                        <td class="text-center">
+
+                                            <button class="badge btn btn-outline-secondary tag_edit" tag="{{dt.id}}" tag_name="{{dt.name}}" >
+                                <i class="ti-pencil"></i>
+                            </button><button class="badge btn btn-outline-danger tag_delete ml-1" tag="{{dt.id}}" tag_name="{{dt.name}}">
+                                <i class="ti-trash"></i>
+                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="card-title d-md-flex align-items-start justify-content-between">
+                            <h6 class="card-title">Add Tag</h6>
+                        </div>
+                    </div>
+                </div>
+                <form action="" method="POST" id="tag_form">
+                    <div class="row">
+                        {% csrf_token %}
+                        <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.name.label}}</label> {{form.name}}
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.description.label}}</label> {{form.description}}
+                        </div>
+                        <div class="col-md-3 form-group">
+                            <label for="exampleInputEmail1">{{form.active.label}}</label> {{form.active}}
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.image.label}}</label> {{form.image}}
+                        </div>
+                        <div class="col-md-12 form-group">
+                            <label for="exampleInputEmail1">{{form.status.label}}</label> {{form.status}}
+                        </div>
+
+                    </div>
+                    <input type="hidden" disabled id="tag_id" name="id" value="">
+                    <input type="hidden" disabled id="tag_action" name="action" value="">
+                </form>
+                <button id="submit" class="btn btn-primary">Add</button>
+                <button id="add_new" class="btn btn-primary">Add New</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--  -->
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+<!-- Bootstrap 4 and responsive compatibility -->
+<script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#myTable').DataTable();
+        $("#add_new").hide();
+        $("#add_new").click(function() {
+            $("#tag_id").prop("disabled", true);
+            validate_submit()
+        });
+        $("#submit").click(function() {
+            validate_submit()
+        });
+        $(".tag_edit").click(function() {
+            $("#id_name").val($(this).attr("tag_name"))
+            $("#id_tag").val($(this).attr("tag_floor"))
+            $("#tag_id").val($(this).attr("tag"))
+            $("#tag_id").removeAttr("disabled")
+            $("#tag_action").val("UPDATE")
+            $("#tag_action").removeAttr("disabled")
+            $("#submit").text("Update");
+            $(this).parent().addClass("active")
+            $("#add_new").show();
+        });
+        $(".tag_delete").click(function() {
+            $("#id_name").val($(this).attr("tag_name"))
+            $("#tag_id").val($(this).attr("tag"))
+            $("#tag_id").removeAttr("disabled")
+            $("#tag_action").val("DELETE")
+            $("#tag_action").removeAttr("disabled")
+            validate_submit()
+        })
+    })
+
+    function validate_submit() {
+        if ($("#id_name").val().trim() == "") {
+            toastr.error("Enter tag name")
+            return false
+        }
+        $("#tag_form").submit()
+    }
+</script>
+{% endblock %}

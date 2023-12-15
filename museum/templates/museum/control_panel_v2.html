@@ -1,0 +1,532 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Control panel
+{% endblock %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{% static 'vendors/dataTable/dataTables.min.css' %}"
+  type="text/css"
+/>
+<!-- cdn for material UI -->
+
+<script src="{% static 'js/react_local/debounce.js'%}" crossorigin></script>
+
+<!-- online cdns for react -->
+<script
+  src="{% static 'js/react_local/react.development.js' %}"
+  crossorigin
+></script>
+<script
+  src="{% static 'js/react_local/react-dom.development.js' %}"
+  crossorigin
+></script>
+<script src="{% static 'js/react_local/babel.js' %}"></script>
+<!-- <script src="{% static 'js/react_local/material_ui.js' %}"></script> -->
+<!-- end online cdns for react -->
+<script type="text/babel">
+
+
+  // Footer Component =================================================
+  // <div className="card">
+  //           <div className="card-body text-center">
+  //             <button className="control-btn" onClick={(e) => handleControl(e)}>
+  //               <i id="pause" className="fa fa-pause-circle-o fa-3x m-2"></i>
+  //             </button>
+  //             <button className="control-btn" onClick={(e) => handleControl(e)}>
+  //               <i id="play" className="fa fa-play-circle-o fa-3x m-2"></i>
+  //             </button>
+  //             <button className="control-btn" onClick={(e) => handleControl(e)}>
+  //               <i id="reload" className="fa fa-refresh fa-3x m-2"></i>
+  //             </button>
+  //           </div>
+  //         </div>
+
+    function Footer({ devArr, send_command }) {
+        return (
+          <>
+           <div className="card">
+            <form method="post">
+              <div className="card-body text-center">
+                <button className="btn btn-lg btn-danger mx-3" type="submit" name="halt_all">
+                  HALT ALL
+                </button>
+                <button className="btn btn-lg btn-success mx-3" type="submit" name="run_all">
+                  RUN ALL
+                </button>
+                <button className="btn btn-lg btn-primary mx-3" type="submit" name="restart_all">
+                  RESET ALL
+                </button>
+              </div>
+              </form>
+            </div>
+          </>
+        );
+      }
+
+    // Card Component =================================================
+
+    function Card({ name, exhibit, id, send_command, status, command, play , data}) {
+      const [isPause, setIsPause] = React.useState(data.current_video_status);
+      const [isMute, setIsMute] = React.useState(data.current_volume == 0? true: false);
+      const [vol, setVol] = React.useState(data.current_volume);
+      const [seek, setSeek] = React.useState(data.current_timestamp);
+      const playName = React.useRef();
+
+
+      let volCommand;
+      let seekCommand;
+
+
+
+      const debounceFunc = debounce((val) => handleChangeVol(val), 500);
+      const seekFunc = debounce((val) => handleChangeSeek(val), 500);
+      // var timeout;
+
+
+      const handleChangeVol = (val) => {
+        var id_ar=[];
+        id_ar[0] = id;
+        setVol(val);
+        send_command(volCommand, id_ar, parseInt(val));
+      };
+
+
+      const handleChangeSeek = (val) => {
+        console.log(val);
+        var id_ar=[];
+        id_ar[0] = id;
+        setSeek(val);
+        send_command(seekCommand, id_ar, vol,parseInt(val));
+      };
+
+      const handleControl = (e) => {
+        var id_ar = [];
+        id_ar[0] = id;
+        // consoled.log(e.target.getAttribute('name'));
+        if (e.target.id == "pause") {
+          send_command(parseInt(e.target.getAttribute('name')), id_ar);
+
+          setIsPause("halt");
+        } else if (e.target.id == "play") {
+          send_command(parseInt(e.target.getAttribute('name')), id_ar);
+          setIsPause("run");
+
+
+        }
+        else if (e.target.id == "next") {
+          send_command(parseInt(e.target.getAttribute('name')), id_ar);
+
+
+        }
+        else if (e.target.id == "prev") {
+          send_command(parseInt(e.target.getAttribute('name')), id_ar);
+
+        }  else {
+          send_command(parseInt(e.target.getAttribute('name')), id_ar);
+        }
+      };
+
+
+      const handleVol = (e) => {
+        volCommand = parseInt(e.target.getAttribute('name'));
+      }
+
+      const handleSeek = (e) =>{
+        seekCommand = parseInt(e.target.getAttribute('name'));
+      }
+
+      const handleMute =(e)=>{
+        setIsMute(!isMute);
+      }
+
+      const handleMute2 = (e)=>{
+        var id_ar=[];
+        id_ar[0] = id;
+        !isMute ? send_command(parseInt(e.target.getAttribute('name')), id_ar, 0) : send_command(parseInt(e.target.getAttribute('name')), id_ar, parseInt(vol));
+      }
+
+      const  format = (time) => {
+        // Hours, minutes and seconds
+        var hrs = ~~(time / 3600);
+        var mins = ~~((time % 3600) / 60);
+        var secs = ~~time % 60;
+
+        // Output like "1:01" or "4:03:59" or "123:03:59"
+        var ret = "";
+        if (hrs > 0) {
+            ret += "" + hrs + ":" + (mins < 10 ? "0" : "");
+        }
+        ret += "" + mins + ":" + (secs < 10 ? "0" : "");
+        ret += "" + secs;
+        return ret;
+    }
+
+    const handleName = () =>{
+      var id_ar=[];
+      id_ar[0] = id;
+      send_command(parseInt(playName.current.name), id_ar, vol, seek, playName.current.value);
+    }
+
+
+    React.useEffect(() => {
+          if(data.current_timestamp !== seek){
+            setSeek(data.current_timestamp);
+          }
+
+        }, [data.current_timestamp]);
+
+      // const volSend = (e) =>{
+      //   console.log(e.target.value);
+      // }
+
+      // const mouseUp = (e) =>{
+      //   console.log('hello');
+      // }
+      // console.log(play);
+      return (
+        <>
+          <div
+            className={
+              "card " + (status == "offline" ? "bg-offline" : "bg-online")
+            }
+          >
+            <div className="card-body">
+              <div className="">
+              <h3 className="card-title text-center">
+                <strong>{name}</strong>
+              </h3>
+              <p className="card-text text-center">
+                <strong>{data.zone}</strong>
+              </p>
+              </div>
+              <div className="row">
+              <div className="text-center col-11 mt-3">
+                { data.video_list && data.video_list.length !==0 ?
+                <div className="col-12">
+                <div className="row mb-5">
+                <select className="form-control col-10" name={command.filter(v => v.name == 'playByName')[0].id} ref={playName}>
+                  <option value="" disabled selected>Select to Play</option>
+                  {data.video_list == "" || data.video_list == null ? null :data.video_list?.map((v, i) => <option key={i} value={v}>{v}</option>)}
+                </select>
+                <button className="btn btn-primary col-2 text-center" onClick={() => handleName()}>Play</button>
+                </div>
+                </div>: ""}
+                {data.video_duration !== 0 ?
+                <div className="col-12 mb-3">
+                <div className="row">
+                <p className="col-1 px-0 mb-0" >0:00</p>
+                <input type="range" defaultValue={seek}  className="test col-9 px-0" id="" name={command.filter(v => v.name == 'gotoTime')[0].id} step="1" min="0" max={data.video_duration}  onChange={(e) => {
+                    seekFunc(e.target.value);
+                    handleSeek(e);
+
+                  }} disabled={status == "offline" ? true : false} key={seek}/>
+                <p className="col-2 px-0 mb-0">{format(data.video_duration)}</p>
+                </div>
+                </div>: ""}
+
+                <button
+                    disabled={status == "offline" ? true : false}
+                    className="control-btn"
+                    onClick={(e) => handleControl(e)}
+                  >
+                    <i id="prev" name={command.filter(v => v.name == 'previousVideo')[0].id} className="fa fa-backward fa-3x m-2"></i>
+                  </button>
+
+                {isPause == 'run' ? (
+                  <button
+                    disabled={status == "offline" ? true : false}
+                    className="control-btn"
+                    value='pause'
+                    onClick={(e) => handleControl(e)}
+                  >
+                    <i id="pause" name={command.filter(v => v.name == 'halt')[0].id} className="fa fa-pause-circle-o fa-3x m-2"></i>
+                  </button>
+
+                ) : (
+                    <button
+                    disabled={status == "offline" ? true : false}
+                    className="control-btn"
+                    onClick={(e) => handleControl(e)}
+                  >
+                    <i id="play" name={command.filter(v => v.name == 'run')[0].id} className="fa fa-play-circle-o fa-3x m-2"></i>
+                  </button>
+                )}
+                  <button
+                    disabled={status == "offline" ? true : false}
+                    className="control-btn"
+                    onClick={(e) => handleControl(e)}
+                  >
+                    <i id="next" name={command.filter(v => v.name == 'nextVideo')[0].id} className="fa fa-forward fa-3x m-2"></i>
+                  </button>
+                <button
+                  disabled={status == "offline" ? true : false}
+                  className="control-btn"
+                  onClick={(e) => handleControl(e)}
+                >
+
+                  <i id="reload" name={command.filter(v => v.name == 'restart')[0].id} className="fa fa-refresh fa-3x m-2"></i>
+
+                </button>
+                <button
+                  disabled={status == "offline" ? true : false}
+                  className={`${vol === 0? 'border_bottom': ''} control-btn`}
+                  onClick={(e) => {handleMute(e); handleMute2(e);}}
+                ><i name={command.filter(v => v.name == 'VOLUME')[0].id} className={isMute ? "fas fa-3x m-2 fa-volume-mute mute_btn" : "fas fa-3x m-2 fa-volume-up"}></i></button>
+
+              </div>
+              <div className="col-1 px-0 text-center">
+                <i className="col-12 fa-lg fa fa-volume-up"></i>
+              <input type="range" defaultValue={vol}  className="test col-12 py-0 input_v" id="input_v" name={command.filter(v => v.name == 'VOLUME')[0].id} step="1" min="0" max="100"  onChange={(e) => {
+                  debounceFunc(e.target.value);
+                  handleVol(e);
+
+                }} disabled={status == "offline" || isMute ? true : false}/>
+              <i className="fa-lg col-12 fa fa-volume-down" ></i>
+              </div>
+              </div>
+            </div>
+          </div>
+        </>
+      );
+    }
+
+  // APP Component =================================================================
+var commands = [
+                          {% for i in command %}
+                            { "id": {{i.id}},"name":"{{i.name}}"},
+                            {% endfor %}
+    ];
+  function App() {
+      const [device, setDevice] = React.useState();
+      const [alert, setAlert] = React.useState("");
+      const [floor, setFloor] = React.useState([]);
+      const [zone, setZone] = React.useState([]);
+      const [exhibit, setExhibit] = React.useState([]);
+      const [status, setStatus] = React.useState("");
+      const [search, setSearch] = React.useState("");
+
+
+      const statusRef = React.useRef()
+        statusRef.current = status;
+
+        const zoneRef = React.useRef()
+        zoneRef.current = zone;
+
+        const exhibitRef = React.useRef()
+        exhibitRef.current = exhibit;
+
+        const floorRef = React.useRef()
+        floorRef.current = floor;
+
+
+      var interval;
+      React.useEffect(() => {
+        DeviceData(floor, zone, exhibit, status);
+
+        interval =  setInterval(function(){ DeviceData(floorRef.current, zoneRef.current, exhibitRef.current, statusRef.current);}, 5000);
+         return
+           clearInterval(interval);
+      }, []);
+
+      function send_command(command, id, vol, seek, name) {
+        let data = {};
+        data["node_id"] = id;
+        data["command_id"] = command;
+        data["volume_number"] = vol;
+        data["gotoTime"] = seek;
+        data["video_name"] = name;
+        console.log(data);
+        $.ajax({
+          type: "POST",
+          data: data,
+          success: function (result) {
+            console.log(result);
+            setAlert(result.status);
+            setTimeout(() => {
+              setAlert("");
+            }, 3000);
+          },
+        });
+      }
+
+    const handleFloor = (e) =>{
+          setFloor([parseInt(e.target.value)]);
+          DeviceData([parseInt(e.target.value)], zone, exhibit, status);
+    }
+
+    const handleZone = (e) =>{
+          setZone([parseInt(e.target.value)]);
+          DeviceData(floor, [parseInt(e.target.value)], exhibit, status);
+    }
+
+    const handleExhibit = (e) =>{
+          setExhibit([parseInt(e.target.value)]);
+          DeviceData(floor, zone ,[parseInt(e.target.value)], status);
+    }
+
+    const handleStatus = (e) =>{
+          setStatus(e.target.value);
+          DeviceData(floor, zone , exhibit, e.target.value);
+    }
+
+    const handleSearch =(e)=>{
+      setSearch(e.target.value.toLowerCase());
+      // DeviceData(floor, zone , exhibit, status, e.target.value);
+    }
+
+
+      var devArr = [];
+      devArr = device?.data.map((v) => {
+        if (v.status == "online") {
+          return v.id;
+        } else {
+          return;
+        }
+      });
+      devArr = devArr?.filter((v) => v != undefined);
+
+      console.log(devArr);
+
+      function DeviceData(floor, zone, exhibit, status, search) {
+        // console.log("hello");
+        //  console.log(floor);
+        let data = {};
+        data["floor_id"] = floor;
+        data["zone_id"] = zone;
+        data["exhibit_id"] = exhibit;
+        data["name"] = search;
+
+        data["status"] = status;
+        console.log(data);
+        $.ajax({
+	  url: '/devices_api/',
+          data: data,
+          success: function (result) {
+
+            //result.data.sort((a,b) => a.name - b.name);
+            console.log(result.data);
+            setDevice(result);
+
+          },
+
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
+
+      console.log(device);
+
+      return (
+        <>
+          <div className="col-12 mt-md-5 mt-lg-0">
+                      <div className="row mb-5">
+                        <div className="col-6"><h1>Control panel</h1></div>
+                        <div className="col-6"><input placeholder="Search Device with Name..." className="mb-5" onChange={(e) => handleSearch(e)}/></div>
+                        
+                          <div className="col-12 my-3">
+                          <div className="row">
+                            {% for i in floor %}
+                              <button className="btn btn-primary btn-lg m-5" onClick={e => handleFloor(e)} value="{{i.id}}">{{i.name}}</button>
+                            {% endfor %}
+                          </div>
+                        </div>
+           
+
+                        <div className="col-4">
+                          <label>Zone:</label>
+                          <select
+                            id="zone_id"
+                            name=""
+                            className="zone"
+                            onChange={e => handleZone(e)}
+                          >
+                          <option value="" selected={true} disabled={true}>Select a Zone</option>
+                          {% for i in zone %}
+                              <option value="{{i.id}}">{{i.name}}</option>
+                          {% endfor %}
+                          </select>
+                        </div>
+                        <div className="col-4">
+                          <label>Exibit:</label>
+                          <select
+                            id="exhibit_id"
+                            name=""
+                            className="exhibit"
+                            onChange={e => handleExhibit(e)}
+                          >
+                          <option value="" selected={true} disabled={true}>Select a Exhibit</option>
+                           {% for i in exhibit %}
+                              <option value="{{i.id}}">{{i.name}}</option>
+                           {% endfor %}
+                          </select>
+                        </div>
+                        <div className="col-4">
+                          <label>Status:</label>
+                          <select
+                            id="status_id"
+                            name=""
+                            className=""
+                            onChange={e => handleStatus(e)}
+                          >
+                          <option value="" selected disabled>Select Status</option>
+                            <option value="All">All</option>
+                            <option value="online">Online</option>
+                            <option value="offline">Offline</option>
+                          </select>
+                        </div>
+
+                      </div>
+                    </div>
+          {alert ? (
+            <div className="alert alert-pop alert-success text-center" role="alert">
+              <i className="ti-check mr-2"></i> {alert}
+            </div>
+          ) : (
+            ""
+          )}
+          <div className="row">
+            {device?.data?.map((v, i) => (
+              v.name.toLowerCase().includes(search)?
+              <div key={i} className="col-md-6 col-lg-4">
+                <Card
+                  data={device.data[i]}
+                  name={v.name}
+                  exhibit={v.exhibit}
+                  send_command={send_command}
+                  id={v.id}
+                  status={v.status}
+                  command={commands}
+                  play={v.current_video_status}
+                />
+              </div>:null
+            ))}
+          </div>
+          <div className="col-12">
+            <Footer devArr={devArr} send_command={send_command} />
+          </div>
+        </>
+      );
+    }
+
+    ReactDOM.render(<App />, document.getElementById("mydiv"));
+</script>
+
+{% endblock %} {% block content %}
+
+<div id="mydiv"></div>
+
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+<!-- Bootstrap 4 and responsive compatibility -->
+<script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/js/external_api.js' %}"></script>
+
+<script>
+  function getDateTime(date) {
+    const event = new Date(date);
+    return event.toString().split("G")[0];
+  }
+</script>
+
+{% endblock %}

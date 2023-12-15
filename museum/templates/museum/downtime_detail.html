@@ -1,0 +1,141 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Project
+Selection {%endblock%} {% block head %}
+<!-- endter the head links here -->
+{% endblock %} {% block content %}
+
+<div class="col-md-12">
+  <div class="card">
+    {% if report_failure %}
+    <div class="card-body">
+      <h6 class="card-title" style="font-weight: 700;">Downtime Details for {{node.name}}</h6>
+      
+
+      
+
+      <!-- Project Table  -->
+      <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th class="text-center">S No.</th>
+            <th class="text-center">Downtime Reason</th>
+            <th class="text-center">Date</th>
+            <th class="text-center">Start time</th>
+            <th class="text-center">End time</th>
+          </tr>
+        </thead>
+        <tbody id="device_list">
+          {% for i in report_failure %}
+          <tr>
+            <td class="text-center">{{ forloop.counter }}</td>
+            <td class="text-center">{{i.reason}}</td>
+            <td class="text-center">{{i.reason_date}}</td>
+            <td class="text-center">{{i.start_time}}</td>
+            <td class="text-center">{{i.end_time}}</td>
+            
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+    </div>
+    {% else %}
+      <div id="card" class="text-center col-12">
+        <div class="card-body">
+          <h1 class="m-5" style="font-size: 50px; line-height: 100px;">
+            There is no Reason for Downtime of <br> <span style="font-weight: 700">{{node.name}}</span>
+          </h1>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Edit modal -->
+
+{% endblock %} {% block script %}
+<script>
+  // let show_req;
+  console.log(document.getElementById("show_lang").value);
+  function startShow (show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_start'] = show_id;
+    data['show_language'] = document.getElementById("show_lang").value;
+
+    console.log(data);
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });
+  }
+
+  function abortShow(show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_abort'] = show_id;
+    data['show_language'] = document.getElementById("show_lang").value;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });  
+  }
+
+  function playShow (show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_play'] = show_id;
+    data['show_language'] = document.getElementById.value;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });
+  }
+
+ function pauseShow(show_id){
+    console.log(show_id);
+    
+    var data={}
+    data['show_id_pause'] = show_id;
+    data['show_language'] = document.getElementById.value;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });  
+  }
+
+
+
+</script>
+{% endblock %}

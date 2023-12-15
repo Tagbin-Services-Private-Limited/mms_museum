@@ -1,0 +1,204 @@
+
+
+{% extends "museum/base.html" %} {% load static %} {% block title %}Show On UI {%endblock%} {% block head %}
+<!-- endter the head links here -->
+{% endblock %} {% block content %}
+
+
+<style>
+.name{width: 300px;
+    background-color: black; 
+}
+.message{
+width: 300px;
+background-color: black;
+}
+.image{
+width: 300px;
+}
+</style>
+
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Show On UI</h6>
+       <div id="alert" class="text-center"></div>
+       <div class="col-md-3 my-3">
+       <select name="" id="show_wall" onchange="command()">
+         <option value="" disabled selected>Select Wall</option>
+         <option value="MEMORY_WALL">Feedback Wall</option>
+         <option value="INDIA@2047">India@2047</option>
+        </select>
+      </div>
+      <!-- Project Table  -->
+      <table id="myTable" class="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th class="text-center">Name</th>
+            <th class="text-center">Message</th>
+            <th class="text-center">Image</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+        <tbody id="device_list">
+        </tbody>
+      </table>
+      <!-- Pagination -->
+
+        <nav aria-label="...">
+          <ul class="pagination">
+            <li class="page-item">
+              <button
+                class="page-link"
+                href="#"
+                tabindex="-1"
+                onclick="handlePrevious();"
+              >
+                Previous
+              </button>
+            </li>
+            <!-- <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="#"
+                >2 <span class="sr-only">(current)</span></a
+              >
+            </li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li> -->
+            <li class="page-item">
+              <button class="page-link" onclick="handleNext();">Next</button>
+            </li>
+          </ul>
+        </nav>
+    </div>
+  </div>
+</div>
+
+<!-- Edit modal -->
+
+{% endblock %} {% block script %}
+<script>
+
+  window.onload = command;
+  // let show_req;
+  function startShow (show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_start'] = show_id;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+        
+        setTimeout(() =>{$('#alert').html(``)},3000);
+        command();
+      }
+   });
+  }
+
+  function select_wall(){
+    var data={};
+    data['node_name'] = document.getElementById("show_wall").value;
+ 
+    $.ajax({
+      type: "GET",
+      data: data,
+      success: function(result){
+        console.log(result);
+       // $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        //setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });  
+  }
+
+  function playShow (show_id){
+    console.log(show_id);
+    var data={}
+    data['show_id_play'] = show_id;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });
+  }
+
+ function pauseShow(show_id){
+    console.log(show_id);
+    
+    var data={}
+    data['show_id_pause'] = show_id;
+
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function(result){
+        console.log(result);
+        $('#alert').html(`<div class="alert alert-success" role="alert">${result.status}</div>`)
+
+        setTimeout(() =>{$('#alert').html(``)},3000)
+
+      }
+  });  
+  }
+
+function command() {
+    
+    var data={};
+    data['node_name'] = document.getElementById("show_wall").value;
+    data["page"] = page_count;
+    $("#device_list").empty();
+    $.ajax({
+      data: data,
+      success: function (result) {
+        console.log(result.data);
+        $("#device_list").append(
+          result.data.map((v, i) => {
+            console.log(v.name);
+            return $(`<tr>
+                        <td class="text-center"><img class="name" src=${v.name} alt="name"/></td>
+            <td class="text-center"><img class="message" src=${v.message} alt="message"/></td>
+            <td class="text-center"><img class="image" src=${v.person_image} alt="image"/></td>
+            <td class="text-center">
+                  <button
+                    class="btn btn-primary m-2"
+                    
+                    onclick="startShow(${v.id})">
+                    Show On UI
+                  </button>
+                </div>
+            </td>
+                    </tr>`);
+          })
+        );
+      },
+    });
+  }
+  var page_count = 1;
+
+  function handleNext() {
+    page_count = page_count + 1;
+
+    command();
+  }
+
+  function handlePrevious() {
+    if (page_count !== 1) {
+      page_count = page_count - 1;
+
+      command();
+    }
+  }
+
+</script>
+{% endblock %}

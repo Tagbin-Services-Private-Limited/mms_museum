@@ -1,0 +1,124 @@
+{% extends "base.html" %} {% load static %} {% block title %}Tag {% endblock %} {% block content %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                <h6 class="card-title">Status List</h6>
+                            </div>
+                        </div>
+                    </div>
+                    {% if data %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive" tabindex="1" style="overflow: hidden; outline: none;">
+                                    <table id="myTable" class="table table-striped table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th class="text-center">Name</th>
+                                            <th class="text-center">Action</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for dt in data %}
+                                            <tr>
+                                                <td class="text-center">{{ dt.name }}</td>
+                                                <td class="text-center">
+
+                                                    <button class="badge btn btn-outline-secondary status_edit"
+                                                            status="{{ dt.id }}" status_name="{{ dt.name }}">
+                                                        <i class="ti-pencil"></i>
+                                                    </button>
+                                                    <button class="badge btn btn-outline-danger status_delete ml-1"
+                                                            status="{{ dt.id }}" status_name="{{ dt.name }}">
+                                                        <i class="ti-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                <h6 class="card-title">Add Status</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <form action="" method="POST" id="status_form">
+                        <div class="row">
+                            {% csrf_token %}
+                            <div class="col-md-12 form-group">
+                                <label for="exampleInputEmail1">{{ form.name.label }}</label> {{ form.name }}
+                            </div>
+                        </div>
+                        <input type="hidden" disabled id="status_id" name="id" value="">
+                        <input type="hidden" disabled id="status_action" name="action" value="">
+                    </form>
+                    <button id="submit" class="btn btn-primary">Add</button>
+                    <button id="add_new" class="btn btn-primary">Add New</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+{% endblock %} {% block script %}
+    <script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+    <!-- Bootstrap 4 and responsive compatibility -->
+    <script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#myTable').DataTable();
+            $("#add_new").hide();
+            $("#add_new").click(function () {
+                $("#status_id").prop("disabled", true);
+                validate_submit()
+            });
+            $("#submit").click(function () {
+                validate_submit()
+            });
+            $(".status_edit").click(function () {
+                $("#id_name").val($(this).attr("status_name"))
+                $("#id_status").val($(this).attr("status_status"))
+                $("#status_id").val($(this).attr("status"))
+                $("#status_id").removeAttr("disabled")
+                $("#status_action").val("UPDATE")
+                $("#status_action").removeAttr("disabled")
+                $("#submit").text("Update");
+                $(this).parent().addClass("active")
+                $("#add_new").show();
+            });
+            $(".status_delete").click(function () {
+                $("#id_name").val($(this).attr("status_name"))
+                $("#status_id").val($(this).attr("status"))
+                $("#status_id").removeAttr("disabled")
+                $("#status_action").val("DELETE")
+                $("#status_action").removeAttr("disabled")
+                validate_submit()
+            })
+        })
+
+        function validate_submit() {
+            if ($("#id_name").val().trim() == "") {
+                toastr.error("Enter status name")
+                return false
+            }
+            $("#status_form").submit()
+        }
+    </script>
+{% endblock %}

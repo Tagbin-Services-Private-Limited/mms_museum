@@ -1,0 +1,291 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Command Logs
+{% endblock %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{% static 'vendors/dataTable/dataTables.min.css' %}"
+  type="text/css"
+/>
+<link
+  rel="stylesheet"
+  href="{% static 'vendors/datepicker/daterangepicker.css' %}"
+  type="text/css"
+/>
+
+{% endblock %} {% block content %}
+
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div
+              class="card-title d-md-flex align-items-start justify-content-between"
+            >
+              <h6
+                style="margin-bottom: 1rem"
+                class="card-title texrt-uppercase"
+              >
+                Command logs
+              </h6>
+            </div>
+          </div>
+          <div class="ml-4">
+            <div class="row">
+              <div class="col-4">
+                <label for="">Device Name:</label>
+                <select
+                  id="device_name"
+                  class="name"
+                  name=""
+                  onchange="command();"
+                  multiple
+                >
+                  {% for i in node %}
+                  <option value="{{i.pk}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-4">
+                <label for="">Date Range: </label>
+                <input
+                  type="text"
+                  name="daterange"
+                  onchange="command();"
+                  value=""
+                />
+              </div>
+              <div class="col-4">
+                <label for="">Command:</label>
+                <select
+                  id="command"
+                  class="command"
+                  name=""
+                  multiple
+                  onchange="command();"
+                >
+                  {% for i in command %}
+                  <option value="{{i.pk}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <!-- <div class="col-3">
+                <label class="text-capitalize" for="f">:</label>
+                <select
+                  id="command_status"
+                  name="floor_type"
+                  class="status"
+                  onchange="command();"
+                  multiple
+                >
+                  <option value="FAILED">FAILED</option>
+                  <option value="SUCCESS">SUCCESS</option>
+                  <option value="ACKNOWLEDGED">ACKNOWLEDGED</option>
+                </select>
+              </div> -->
+            </div>
+          </div>
+        </div>
+        <!-- have to change this to a better solution -->
+        <div class="row" style="margin-top: 20px">
+          <div class="col-md-12">
+            <div class="table-responsive" tabindex="1" style="overflow: hidden">
+              <table id="myTable" class="table table-striped command_log_table">
+                <div class="row">
+                  <div class="col-1 text-center"><p class="mb-0">S No.</p></div>
+                  <div class="col-1 text-center">
+                    <p class="mb-0">Device name</p>
+                  </div>
+                  <div class="col-1 text-center">
+                    <p class="mb-0">Command</p>
+                  </div>
+                  <div class="col-2">
+                    <p class="mb-0 text-center">Command Status</p>
+                  </div>
+                  <div class="col-4 text-center">
+                    <p class="mb-0">Message</p>
+                  </div>
+                  <div class="col-1 text-center">
+                    <p class="mb-0">Updated By</p>
+                  </div>
+                  <div class="col-2 text-center">
+                    <p class="mb-0">Date/Time</p>
+                  </div>
+                </div>
+                <tbody id="command_log">
+                  <tr></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination -->
+
+        <nav aria-label="...">
+          <ul class="pagination">
+            <li class="page-item">
+              <button
+                class="page-link"
+                href="#"
+                tabindex="-1"
+                onclick="handlePrevious();"
+              >
+                Previous
+              </button>
+            </li>
+            <!-- <li class="page-item"><a class="page-link" href="#">1</a></li>
+            <li class="page-item active" aria-current="page">
+              <a class="page-link" href="#"
+                >2 <span class="sr-only">(current)</span></a
+              >
+            </li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li> -->
+            <li class="page-item">
+              <button class="page-link" onclick="handleNext();">Next</button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  -->
+
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+<!-- Bootstrap 4 and responsive compatibility -->
+<script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/js/external_api.js' %}"></script>
+<script src="{% static 'vendors/datepicker/daterangepicker.js' %}"></script>
+
+<script>
+  // search select
+  $(document).ready(function () {
+    $(".name").select2({
+      placeholder: "Select a device",
+    });
+  });
+
+  $(document).ready(function () {
+    $(".command").select2({
+      placeholder: "Select a Command",
+    });
+  });
+
+  $(document).ready(function () {
+    $(".status").select2({
+      placeholder: "Select Command Status",
+    });
+  });
+
+  // range date filter
+
+  var start_date, end_date;
+  $(function () {
+    $('input[name="daterange"]').daterangepicker(
+      {
+        opens: "left",
+      },
+      function (start, end, label) {
+        start_date = start.format("YYYY-MM-DD");
+        end_date = end.format("YYYY-MM-DD");
+      }
+    );
+  });
+
+  // ajax function to display command logs on frontend >>>>
+
+  function command() {
+    var device_id = $("#device_name").val();
+    var date_range = [start_date, end_date];
+    var command_id = $("#command").val();
+    var command_status = $("#command_status").val();
+    let data = {};
+    data["node_id"] = device_id;
+    data["date_range"] = date_range;
+    data["command_id"] = command_id;
+    data["command_status"] = command_status;
+    data["page"] = page_count;
+    console.log(data);
+    $("#command_log").empty();
+    $.ajax({
+      data: data,
+      success: function (result) {
+        console.log(result.data);
+        $("#command_log").append(
+          result.data.map((v, i) => {
+            // console.log(v);
+            return $(`<tr>
+                        <td class="text-center col-1">${(25 * (page_count - 1)) + i + 1}</td>
+                        <td style='display: none'>${v.pk}</td>
+                        <td class='text-center col-1'><a href='/{{org.pk}}/{{proj.pk}}/device_detail/${
+                          v.pk
+                        }'>${v.device_name}</a></td>
+                        <td class='text-center col-1'>${v.command_name}</td>
+                        <td class="p-0 col-9">
+                          <table class="col-12 command_log_table">
+                          ${v.multiple
+                            .map(
+                              (k, i) => `<tr>
+                            ${
+                              k.status == "FAILED"
+                                ? `<td class='text-center col-2'><span class="badge badge-danger">${k.status}</span></td>`
+                                : k.status == "ACKNOWLEDGED"
+                                ? `<td class='text-center col-2'><span class="badge badge-warning">${k.status}</span></td>`
+                                : `<td class='text-center col-2'><span class="badge badge-success">${k.status}</span></td>`
+                            }
+                            <td class="text-center command_log_table_msg col-6">${
+                              k.message
+                            }
+                            </td>
+                            <td class="text-center col-2">${
+                              k.updated_by.includes(":") ? "Node" : k.updated_by
+                            }</td>
+                            <td class='text-center col-2'>${getDateTime(
+                              k.date
+                            )}</td>
+                            </tr>`
+                            )
+                            .join("")}
+                        </table></td>
+                    </tr>`);
+          })
+        );
+      },
+    });
+  }
+
+  // function to set the date formate
+
+  function getDateTime(date) {
+    const event = new Date(date);
+    return event.toString().split("G")[0];
+  }
+
+  // function handles pagination
+
+  var page_count = 1;
+
+  function handleNext() {
+    page_count = page_count + 1;
+
+    command();
+  }
+
+  function handlePrevious() {
+    if (page_count !== 1) {
+      page_count = page_count - 1;
+
+      command();
+    }
+  }
+</script>
+
+{% endblock %}

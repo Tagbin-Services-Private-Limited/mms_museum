@@ -1,0 +1,181 @@
+{% extends "base.html" %} {% load static %} {% block title %}Device List {% endblock %} {% block head %}
+    <link rel="stylesheet" href="{% static 'vendors/dataTable/dataTables.min.css' %}" type="text/css"/> {% endblock %}
+{% block content %}
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="card-title d-md-flex align-items-start justify-content-between">
+                                <h6 class="card-title">All Devices</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="table-responsive" tabindex="1" style="overflow: hidden; outline: none;">
+                                <table id="myTable" class="table table-striped table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th>Device Name</th>
+                                        <th class="text-center">Unique Reg. Code</th>
+                                        <th class="text-center">IP</th>
+                                        <th class="text-center">Installation</th>
+                                        <th class="text-center">Status</th>
+                                        <th class="text-center">Action</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--  -->
+    <div class="modal fade" id="device_detail_modal" tabindex="-1" role="dialog" style="display: none;">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+            <div class="modal-content" style="background: transparent;border: 0;margin-top: 10%;">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <div class="card-title d-md-flex align-items-start justify-content-between">
+                                        <h6 class="card-title">Detail of <span id="node_name"></span></h6>
+                                    </div>
+{#                                    <div>#}
+{#                                        <h6 class="card-title"><span id="unique_code"></span></h6>#}
+{#                                    </div>#}
+                                    <form method="POST" id="detail_form">
+                                        {% csrf_token %}
+                                        <div class="form-group">
+                                            <label for="exampleInputEmail1">{{ form.installation.label }}</label> {{ form.installation }}
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="exampleInputPassword1">{{ form.heartbeat_rate.label }}</label> {{ form.heartbeat_rate }}
+                                        </div>
+                                        <input type="hidden" name="node" value="">
+
+                                    </form>
+
+                                    <button type="button" class="btn btn-primary" id="detail_form_button">Submit
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %} {% block script %}
+    <script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+    <!-- Bootstrap 4 and responsive compatibility -->
+    <script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+    <script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+    <script src="{% static 'assets/js/external_api.js' %}"></script>
+    <script>
+        var timeinter;
+        var tb;
+        $(document).ready(function () {
+            tb = $('#myTable').DataTable()
+            $("select").addClass("form-control")
+            $("tbody").on("click", ".config-btn", function () {
+                clearTimeout(timeinter)
+                var id = $(this).attr("device_id")
+                var txt = $(this).text()
+                var code = $(this).attr("code")
+                var details = $(this).attr("detail").split("~~")
+                if (details[0] != "") {
+                    console.log("in")
+                    $("[name=installation]").val(details[0])
+                }
+                if (details[1]) {
+                    $("[name=heartbeat_rate]").val(details[1])
+                }
+                $("#node_name").text(txt)
+                $("#unique_code").text(code)
+                $("[name=node]").val(id)
+                $("#device_detail_modal").modal('show')
+            });
+
+            $("#detail_form_button").click(function () {
+                $("#detail_form").submit();
+            });
+            showLoader()
+            ajaxRequest()
+        });
+
+        function makelist(data) {
+            var url_mask = "{% url 'mms:device_detail' pk=12345 %}".replace(/12345/, data["id"].toString()),
+                installation = "Not assigned",
+                ip = "Not assigned",
+                unique_code = "Not assigned",
+                detail = "",
+                isconfig = false;
+            if ("installation" in data["details"]) {
+                isconfig = true;
+                installation = data["details"]["installation"]
+                detail = data["details"]["installation_id"] + '~~' + data["details"]["heartbeat_rate"]
+
+            }
+            html = '<tr>\
+                    <td class="node_names"><a href="' + url_mask + '">' + data["name"] + '</a></td>\
+                    \<td class="text-center">' + data["code"] + '</td>\
+                    \<td class="text-center">' + data["ip"] + '</td>\
+                    <td class="text-center">' + installation + '</td>';
+
+            if (data["status"] == "online") {
+                html += '<td class="text-success text-center"><span class="badge badge-success mr-2 d-sm-inline d-none">Online</span></td>'
+            } else if (!isconfig) {
+                html += '<td class="text-warning text-center"><span class="badge badge-warning mr-2 d-sm-inline d-none">Waiting for configure</span></td>'
+            } else {
+                html += '<td class="text-danger text-center"><span class="badge badge-danger mr-2 d-sm-inline d-none">Offline</span></td>'
+            }
+            if (isconfig) {
+                html += '<td class="text-center"><a target="_blank" href="https://localhost/?login={{mesh_token}}&viewmode=11&node=' + data["node_id"] + '&hide=31"><button class="badge btn btn-info">Connect</button></a></td>'
+            } else {
+                html += '<td class="text-warning text-center"><button class="badge btn btn-warning config-btn" device_id=' + data["id"] + ' detail="' + detail + '">Configure</button></td>'
+            }
+            html += ' </tr>'
+            return html
+        }
+
+        function ajaxRequest() {
+            $.ajax({
+                type: "GET",
+                url: "{% url 'mms:device_list_ajax'%}",
+                success: function (response) {
+                    tb.clear().destroy()
+                    var html = ''
+                    $.each(response, function (k, v) {
+                        html += makelist(v)
+                    })
+                    $("tbody").html(html);
+                    tb = $('#myTable').DataTable({
+                        "bDestroy": true,
+                    })
+                    if (timeinter) {
+                        clearTimeout(timeinter)
+                    }
+                    hideLoader()
+                    timeinter = setTimeout(ajaxRequest, 10000)
+                },
+
+                error: function (error) {
+                    setTimeout(hideLoader, 1000)
+                    toastr.error(error.responseJSON.error)
+                }
+            });
+        }
+    </script>
+{% endblock %}

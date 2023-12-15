@@ -1,0 +1,370 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Content
+Upload {%endblock%} {% block head %}
+<script type="text/javascript">
+  $(function () {
+    $("#myTable").sortable({
+      items: "tr:not(tr:first-child)",
+      cursor: "pointer",
+      axis: "y",
+      dropOnEmpty: false,
+      start: function (e, ui) {
+        ui.item.addClass("selected");
+      },
+      stop: function (e, ui) {
+        ui.item.removeClass("selected");
+        $(this)
+          .find("tr")
+          .each(function (index) {
+            if (index > 0) {
+            }
+          });
+        setTimeout(function () {
+          order_list();
+        }, 500);
+      },
+    });
+  });
+</script>
+{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card mt-2">
+      <div class="card-body">
+        <h6 class="card-title">Content Upload</h6>
+        <p id="loading" style="display: none" class="text-center text-success">
+          Loading...
+        </p>
+        <div class="px-3">
+          <div class="row">
+            <div class="form-group col-3">
+              <label for="">Select Device:</label>
+              <select
+                class=""
+                name="device_name"
+                id="device_name"
+                onchange="setTimeout(function(){order_list();}, 500); node_files(); enable_upload();"
+              >
+                {% if node %}
+                <option value="{{node.pk}}" selected>{{node.name}}</option>
+                {% else %}
+                <option value="" disabled selected>Select Device</option>
+                {% endif %} {% for i in devices %}
+                <option value="{{i.pk}}" default>{{i.name}}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-9 content-filters">
+              <div class="row">
+                <div class="form-group col-4">
+                  <label for="">Floor:</label>
+                  <input class="" name="" id="floor"/>
+                </div>
+                <div class="form-group col-4">
+                  <label for="">Zone:</label>
+                  <input class="" name="" id="zone"/>
+                </div>
+                <div class="form-group col-4">
+                  <label for="">Exibits:</label>
+                  <input class="" name="" id="exhibit"/>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12">
+            <div class="file-upload-wrapper my-2">
+              <input
+                name="device_file"
+                type="file"
+                id="device_file"
+                class="drag-input"
+                multiple
+                onchange="enable_upload();"
+              />
+            </div>
+            <button
+              class="btn btn-primary"
+              onclick="setTimeout(function(){node_files();}, 500); upload_content(); order_list();"
+              id="upload-btn"
+              disabled
+            >
+              Content Upload
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card mt-2">
+      <div class="card-body">
+        <h6 class="card-title text-capitalize">Uploaded content on Device</h6>
+        <h6 class="text-center" id="select_msg">Please Select a Device</h6>
+        <div class="table-device-files" style="display: none" id="myTable_head">
+          <table id="myTable" class="table table-array table-striped">
+            <thead>
+              <tr>
+                <th>
+                  <input
+                    id="check-all"
+                    class="device-checkbox text-left"
+                    type="checkbox"
+                    value="Select All"
+                    onclick="delete_all(this);"
+                  />
+                </th>
+                <th>Order</th>
+                <th>File Name</th>
+                <th>Date</th>
+                <th>File Size</th>
+                <th class="text-right">
+                  <button
+                    data-toggle="modal"
+                    data-target="#exampleModalCenter"
+                    class="btn btn-danger"
+                  >
+                    Delete
+                  </button>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="content-list">
+              <tr></tr>
+            </tbody>
+          </table>
+          <button class="btn btn-primary" onclick="show(); orderArray();">
+            Set Order
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- delete pop up -->
+
+<div
+  class="modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">
+          Do you want to delete this Content?
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <!-- <div class="modal-body">
+          ...
+        </div> -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">
+          Cancel
+        </button>
+        <button
+          type="button"
+          id="confirm_delete"
+          onclick="setTimeout(function(){node_files();}, 500);"
+          data-dismiss="modal"
+          class="btn btn-danger"
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block script %}
+<script>
+  var delete_array = [];
+  $("#content-from").submit(function (e) {
+    e.preventDefault();
+  });
+
+  $("#check-all").click(function () {
+    $("input:checkbox").not(this).prop("checked", this.checked);
+  });
+
+  $(document).ready(function () {
+    $("#device_name").select2({
+      placeholder: "Select a device",
+    });
+  });
+
+  var myArray = new Array();
+
+  function order_list() {
+    console.log("done");
+    myArray = [];
+    $(document).ready(function () {
+      $("#content-list td:nth-child(3)").each(function (i) {
+        myArray.push($(this).text());
+      });
+    });
+  }
+
+  function delete_all(e) {
+    if (e.checked == true) {
+      $(document).ready(function () {
+        $("#content-list td:nth-child(3)").each(function (i) {
+          delete_array.push($(this).text());
+        });
+      });
+    } else {
+      delete_array = [];
+    }
+  }
+
+  function show() {
+    console.log(myArray);
+  }
+
+  $(document)
+    .ajaxStart(function () {
+      $("#loading").show();
+    })
+    .ajaxStop(function () {
+      $("#loading").hide();
+    });
+
+
+  function formatBytes(bytes, decimals = 2) {
+    if (bytes === 0) return '0 Bytes';
+
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  }
+
+  function node_files() {
+    var test;
+    $("#content-list").find("td").remove();
+    var data = {};
+    //console.log($(this).val());
+    var devices = $("#device_name").val();
+    data["device_name"] = devices;
+    $.ajax({
+      data: data,
+      success: function (result) {
+        console.log(result.floor);
+        $("#floor").val(result.floor);
+        $("#zone").val(result.zone);
+        $("#exhibit").val(result.exhibit);
+        $("#myTable_head").show();
+        $("#select_msg").hide();
+        $("#content-list").append(
+          result.data.map((v, i) => {
+            return $(`<tr>
+                        <td><input class='device-checkbox' type="checkbox" value='${
+                          v.file_pk
+                        }' onclick='delete_multi(this);'/></td>
+                        <td>${i + 1}</td>
+                        <td style='display: none'>${v.file_pk}</td>
+                        <td><a href='${v.url}'>${v.name.split("/")[2]}</a></td>
+                        <td>${v.date}</td>
+                        <td>${formatBytes(v.size, 0)}</td>
+                        <td class="text-right"><button type='button' data-toggle="modal" data-target="#exampleModalCenter" onclick='delete_content(this);' value='${
+                          v.file_pk
+                        }' class="btn btn-primary">Delete</buton>
+                        </td>
+                    </tr>`);
+          })
+        );
+      },
+    });
+  }
+
+  function upload_content() {
+    var data = new FormData();
+    data.append("device_name", document.getElementById("device_name").value);
+    $.each($("#device_file")[0].files, function (i, file) {
+      data.append("device_file", file);
+    });
+
+    console.log(data);
+    $.ajax({
+      type: "POST",
+      data: data,
+      processData: false,
+      cache: false,
+      contentType: false,
+      success: function (result) {},
+    });
+
+    document.getElementById("device_file").value = "";
+  }
+
+  function delete_multi(e) {
+    if (e.checked == true) {
+      delete_array.push(e.value);
+      $("#confirm_delete").val(delete_array);
+    } else {
+      delete_array = delete_array.filter((item) => item !== e.value);
+      $("#confirm_delete").val(delete_array);
+    }
+    console.log(delete_array);
+  }
+  const delete_content = (e) => {
+    delete_array.push(e.value);
+    $("#confirm_delete").val(delete_array);
+  };
+
+  $("#confirm_delete").click(function () {
+    var data = {};
+    let confirmId = delete_array;
+    let device_id = $("#device_name").val();
+    data["file_pk"] = confirmId;
+    data["device_id"] = device_id;
+    console.log(data);
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function (result) {
+        console.log(result);
+        file_pk = [];
+      },
+    });
+  });
+
+  function enable_upload() {
+    if ($("#device_file").val() == "" || $("#device_name").val() == null) {
+      $("#upload-btn").attr("disabled", true);
+    } else {
+      $("#upload-btn").attr("disabled", false);
+      console.log("done");
+    }
+  }
+
+  function orderArray() {
+    var data = {};
+    data["position_array"] = myArray;
+
+    console.log(data);
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function (result) {
+        // console.log(result);
+        node_files();
+      },
+    });
+  }
+</script>
+{% endblock %};

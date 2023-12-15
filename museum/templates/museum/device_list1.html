@@ -1,0 +1,492 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Device List
+{% endblock %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{% static 'vendors/dataTable/dataTables.min.css' %}"
+  type="text/css"
+/>
+{% endblock %} {% block content %}
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12"></div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div
+              class="
+                card-title
+                d-md-flex
+                align-items-start
+                justify-content-between
+              "
+            >
+              <h6 style="margin-bottom: 1rem" class="card-title">
+                All Devices
+              </h6>
+            </div>
+            <div class="row">
+              <div class="col-3">
+                <label for="">Floor:</label>
+                <select
+                  id="floor_id"
+                  name=""
+                  class="floor"
+                  onchange="filter_data();"
+                  multiple
+                >
+                  {% for i in floor %}
+                  <option value="{{i.pk}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-2">
+                <label for="">Zone:</label>
+                <select
+                  id="zone_id"
+                  name=""
+                  class="zone"
+                  onchange="filter_data();"
+                  multiple
+                >
+                  {% for i in zone %}
+                  <option value="{{i.pk}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-3">
+                <label for="">Exibit:</label>
+                <select
+                  id="exhibit_id"
+                  name=""
+                  class="exhibit"
+                  onchange="filter_data();"
+                  multiple
+                >
+                  {% for i in exhibit %}
+                  <option value="{{i.pk}}">{{i.name}}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="col-2">
+                <label for="">Status:</label>
+                <select
+                  id="status_id"
+                  name=""
+                  class="status"
+                  onchange="filter_data();"
+                >
+                  <option value="All" selected>All</option>
+                  <option value="online">Online</option>
+                  <option value="Offline">Offline</option>
+                </select>
+              </div>
+              <div class="col-2">
+                <label class="text-capitalize" for=""
+                  >Commands for selected device:</label
+                >
+                <select class="d-inline col-8" id="multi_command" name="">
+                  {% for i in command %}
+                  <option value="{{i.pk}}">{{ i.name }}</option>
+                  {% endfor %}
+                </select>
+                <button
+                  class="btn btn-info mb-1 d-inline"
+                  onclick="multi_command(); send_command();"
+                >
+                  Send
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" style="margin-top: 20px">
+          <div class="col-12" id="command_msg"></div>
+          <div class="col-md-12">
+            <div
+              class="table-responsive"
+              tabindex="1"
+              style="overflow: hidden; outline: none"
+            >
+              <div class="row">
+                <div class="col-12">
+                  <table
+                    id="myTable"
+                    class="table table-striped table-bordered"
+                  >
+                    <thead>
+                      <tr>
+                        <th class="text-center">
+                          <input
+                            id="check-all"
+                            class="device-checkbox"
+                            type="checkbox"
+                            value="Select All"
+                          />
+                        </th>
+                        <th></th>
+                        <th class="text-center">Device Name</th>
+                        <th class="text-center">IP</th>
+                        <th class="text-center">Exibits</th>
+                        <th class="text-center">Status</th>
+                        <th class="text-center">Command</th>
+                      </tr>
+                    </thead>
+                    <tbody id="device_list"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--  -->
+
+<div
+  class="modal fade"
+  id="device_detail_modal"
+  tabindex="-1"
+  role="dialog"
+  style="display: none"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div
+      class="modal-content"
+      style="background: transparent; border: 0; margin-top: 10%"
+    >
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="card">
+              <div class="card-body">
+                <div
+                  class="
+                    card-title
+                    d-md-flex
+                    align-items-start
+                    justify-content-between
+                  "
+                >
+                  <h6 class="card-title">
+                    Detail of Device<span id="node_name"></span>
+                  </h6>
+                </div>
+                <div>
+                  <h6 class="card-title">
+                    <b>Unique Code:- </b><span id="unique_code"></span>
+                  </h6>
+                </div>
+                <div>
+                  <h6 class="card-title">
+                    <b>IP Address:- </b><span id="ip"></span>
+                  </h6>
+                </div>
+                <div>
+                  <h6 class="card-title">
+                    <b>MAC Address:- </b><span id="mac"></span>
+                  </h6>
+                </div>
+
+                <hr />
+                <h6 class="card-title">
+                  Configure Device<span id="node_name"></span>
+                </h6>
+
+                <form method="POST" id="detail_form">
+                  {% csrf_token %}
+                  <div class="row">
+                    <div class="form-group col-12">
+                      <label for="exampleInputPassword1">Device Name:</label>
+                      <input
+                        id="device_name"
+                        type="text"
+                        name="device_name"
+                        value=""
+                      />
+                    </div>
+                    <div class="col-6">
+                      <label for="">Hearbeat Rate (in seconds):</label>
+                      <input class="" type="number" />
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="">Floor:</label>
+                      <select id="">
+                        <option value="">Select a Floor</option>
+                        {% for i in floor %}
+                        <option value="{{i.pk}}">{{i.name}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="">Zone:</label>
+                      <select id="">
+                        <option value="">Select a Zone</option>
+                        {% for i in zone %}
+                        <option value="{{i.pk}}">{{i.name}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                    <div class="form-group col-6">
+                      <label for="">Exibit:</label>
+                      <select id="">
+                        <option value="">Select a Exhibit</option>
+                        {% for i in exhibit %}
+                        <option value="{{i.pk}}">{{i.name}}</option>
+                        {% endfor %}
+                      </select>
+                    </div>
+                  </div>
+
+                  <input type="hidden" name="node" value="" />
+                </form>
+
+                <button
+                  type="button"
+                  class="btn btn-primary"
+                  id="detail_form_button"
+                >
+                  Submit
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/dataTable/jquery.dataTables.min.js' %}"></script>
+
+<!-- Bootstrap 4 and responsive compatibility -->
+<script src="{% static 'vendors/dataTable/dataTables.bootstrap4.min.js' %}"></script>
+<script src="{% static 'vendors/dataTable/dataTables.responsive.min.js' %}"></script>
+<script src="{% static 'assets/js/external_api.js' %}"></script>
+
+<script>
+  window.onload = function () {
+    filter_data();
+    // filter_data1();
+  };
+  // check all checkbox
+
+  $("#check-all").click(function () {
+    $("input:checkbox").not(this).prop("checked", this.checked);
+  });
+
+  // assigning command id
+  let command_id;
+  let device_arr = [];
+  function multi_command() {
+    command_id = $("#multi_command").val();
+    console.log(command_id);
+  }
+
+  function single_command_id(e) {
+    command_id = e.value;
+  }
+
+  // single Pushing device id in a array
+
+  function single_device(e) {
+    device_arr.push(e.value);
+    console.log(command_id, device_arr);
+  }
+
+  // multi Pushing device id in a array
+
+  function device_list(e) {
+    if (e.checked == true) {
+      device_arr.push(e.value);
+    } else {
+      device_arr = device_arr.filter((item) => item !== e.value);
+    }
+    console.log(device_arr);
+  }
+
+  function status_show(id) {
+    var data_id = id;
+    let data = {};
+    let response;
+
+    data["id_status"] = data_id;
+
+    $.ajax({
+      data: data,
+      async: !1,
+      success: function (result) {
+        response = result;
+      },
+    });
+
+    var id_a = "#" + data_id.toString() + "status";
+    $(id_a).html(response.status);
+
+    return;
+  }
+
+  // Filter GET ajax
+  function filter_data() {
+    var floor = $("#floor_id").val();
+    var zone = $("#zone_id").val();
+    var exhibit = $("#exhibit_id").val();
+    var status = $("#status_id").val();
+
+    // console.log(floor, zone, exhibit);
+    let data = {};
+    data["floor_id"] = floor;
+    data["zone_id"] = zone;
+    data["exhibit_id"] = exhibit;
+
+    console.log(data);
+    $.ajax({
+      data: data,
+      success: function (result) {
+        console.log(result);
+        $("#device_list").empty();
+        $("#device_list").append(
+          result.data.map((v, i) => {
+            return $(`<tr>
+
+
+                        <td class="text-center"><input class="device-checkbox" type="checkbox" value='${
+                          v.id
+                        }' onclick='device_list(this);' /></td>
+                        <td class="text-center">${i + 1}</td>
+                        <td class='text-center'><a href='${v.url}'>${
+              v.name
+            }</a></td>
+                        <td class='text-center'>${v.ip}</td>
+
+                        <td class='text-center'>${v.exhibit}</td>
+                        <td class='text-center' id=${v.id + "status"}>${
+              v.status
+            }${
+              v.is_config == true
+                ? setInterval(function () {
+                    status_show(v.id);
+                  }, v.heartbeat_rate * 1000)
+                : `<span class="badge badge-warning">Not Configured</span>`
+            }</td>
+
+                    <td>
+
+                      <div class="text-center">
+                        ${
+                          v.is_config == true
+                            ? `<select
+                        class="form-control d-inline mr-2 col-6 command_select"
+                        name=""
+                        id="${v.id}"
+                        onchange='single_command_id(this);'
+                        ${status_show(v.id) == "offline" ? `disabled` : ``}
+                      >
+                      <option value="" selected disabled>Select Command</option>
+          ${result.command.map((k) => {
+            return `<option value="${k.id}">${k.name}</option>`;
+          })}</select>
+                      <button
+                        value="${v.id}"
+                        class="btn btn-info mb-1 d-inline"
+                        onclick="single_device(this); send_command();"
+                        ${status_show(v.id) == "offline" ? `disabled` : ``}
+                      >
+                        Send
+                      </button>`
+                            : `<button class="btn btn-warning" data-toggle="modal" data-target="#device_detail_modal" >Configure</button>`
+                        }
+                      </div>
+                        </td>
+                    </tr>`);
+          })
+        );
+      },
+    });
+  }
+
+  console.log(localStorage.getItem("project"));
+
+  // function filter_data1() {
+  //   var floor = $("#floor_id").val();
+  //   var zone = $("#zone_id").val();
+  //   var exhibit = $("#exhibit_id").val();
+
+  //   // console.log(floor, zone, exhibit);
+  //   let data = {};
+  //   data["floor_id"] = floor;
+  //   data["zone_id"] = zone;
+  //   data["exhibit_id"] = exhibit;
+  //   // console.log(data);
+  //   $.ajax({
+  //     data: data,
+  //     success: function (result) {
+  //       // console.log(result);
+  //       $("#device_status").empty();
+  //       $("#device_status").append(
+  //         result.data.map((v, i) => {
+  //           return `<tr>
+  //             <td style="line-height: 2.6rem;" class='text-center'><span class="badge badge-danger">${status}</span></td>
+  //             </tr>`;
+  //         })
+  //       );
+  //     },
+  //   });
+  // }
+
+  // Multi select js
+
+  $(document).ready(function () {
+    $(".floor").select2({
+      placeholder: "Select a Floor",
+    });
+  });
+
+  $(document).ready(function () {
+    $(".exhibit").select2({
+      placeholder: "Select a Exhibit",
+    });
+  });
+
+  $(document).ready(function () {
+    $(".zone").select2({
+      placeholder: "Select a Zone",
+    });
+  });
+  $(document).ready(function () {
+    $(".status").select2({
+      placeholder: "Select a Status",
+    });
+  });
+
+  // send command POST ajax
+  function send_command() {
+    let data = {};
+    data["node_id"] = device_arr;
+    data["command_id"] = command_id;
+    console.log(data);
+    $.ajax({
+      type: "POST",
+      data: data,
+      success: function (result) {
+        device_arr = [];
+        command_id = "";
+        console.log(result);
+        document.getElementById(
+          "command_msg"
+        ).innerHTML = `<div class="alert alert-success text-center" role="alert">${result.status}</div>`;
+        setTimeout(function () {
+          document.getElementById("command_msg").innerHTML = "";
+        }, 3000);
+      },
+    });
+  }
+</script>
+
+{% endblock %}

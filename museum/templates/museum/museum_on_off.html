@@ -1,0 +1,258 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Museum On
+Off{%endblock%} {% block head %}
+<!-- endter the head links here -->
+{% endblock %} {% block content %}
+
+<div class="col-md-12">
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Shut Down Museum</h6>
+      <div class="row">
+        {% for i in floor %}
+        <button
+          class="btn btn-danger btn-lg mx-3"
+          id="{{i.pk}}"
+          data-toggle="modal"
+          data-target="#exampleModal{{i.pk}}"
+        >
+          {{i.name}}
+        </button>
+
+        <!-- Turn off pop up -->
+
+        <div
+          class="modal fade"
+          id="exampleModal{{i.pk}}"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <!-- <h5 class="modal-title" id="exampleModalLabel">hello</h5> -->
+                <h5>Are you sure, you want to Shutdown {{i.name}} ?</h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <form method="POST">
+                  <button
+                    type="submit"
+                    value="{{i.pk}}"
+                    name="shutdown_floor_id"
+                    class="btn btn-primary"
+                  >
+                    Yes
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Turn On Museum</h6>
+      <div class="row">
+        {% for i in floor %}
+        <button
+          class="btn btn-success btn-lg mx-3"
+          id="{{i.pk}}"
+          data-toggle="modal"
+          data-target="#exampleModal1{{i.pk}}"
+        >
+          {{i.name}}
+        </button>
+
+        <!-- Turn on pop up -->
+
+        <div
+          class="modal fade"
+          id="exampleModal1{{i.pk}}"
+          tabindex="-1"
+          role="dialog"
+          aria-labelledby="exampleModalLabel"
+          aria-hidden="true"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <!-- <h5 class="modal-title" id="exampleModalLabel">hello</h5> -->
+                <h5>Are you sure, you want to Turn on {{i.name}}?</h5>
+                <button
+                  type="button"
+                  class="close"
+                  data-dismiss="modal"
+                  aria-label="Close"
+                >
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-footer">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  data-dismiss="modal"
+                >
+                  Cancel
+                </button>
+                <form method="POST">
+                  <button
+                    type="submit"
+                    value="{{i.pk}}"
+                    name="TurnOn_floor_id"
+                    class="btn btn-primary"
+                  >
+                    Yes
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-body">
+      <h6 class="card-title">Projector Turn On/ Turn Off</h6>
+
+      <button
+        class="btn btn-danger btn-lg mx-3"
+        data-toggle="modal"
+        data-target="#exampleModal"
+      >
+        Turn Off Projectors
+      </button>
+
+      <button
+        class="btn btn-success btn-lg mx-3"
+        data-toggle="modal"
+        data-target="#exampleModal21"
+      >
+        Turn On Projectors
+      </button>
+
+      <a
+        class="btn btn-primary btn-lg mx-3 float-right"
+        href="/{{org.pk}}/{{proj.pk}}/projectors"
+        >Control Projectors</a
+      >
+
+      <!-- turn on projectors -->
+      <div
+        class="modal fade"
+        id="exampleModal21"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <!-- <h5 class="modal-title" id="exampleModalLabel">hello</h5> -->
+              <h5>Are you sure you want to Turn on Projectors?</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <form method="POST">
+                <button
+                  type="submit"
+                  name="TurnOn_projectors"
+                  class="btn btn-primary"
+                >
+                  Yes
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- turn off projectors -->
+      <div
+        class="modal fade"
+        id="exampleModal"
+        tabindex="-1"
+        role="dialog"
+        aria-labelledby="exampleModalLabel"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <!-- <h5 class="modal-title" id="exampleModalLabel">hello</h5> -->
+              <h5>Are you sure you want to Turn off Projectors?</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <form method="POST">
+                <button
+                  type="submit"
+                  name="shutdown_projectors"
+                  class="btn btn-primary"
+                >
+                  Yes
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block script %}
+<script></script>
+{% endblock %}
+

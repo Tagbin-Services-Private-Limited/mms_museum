@@ -1,0 +1,489 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Dashboard
+{%endblock %} {% block head %}
+<link
+  rel="stylesheet"
+  href="{% static 'vendors/dataTable/dataTables.min.css' %}"
+  type="text/css"
+/>
+{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-lg-3 col-md-6 col-sm-12">
+    <div class="card">
+      <a href="/{{org.pk}}/{{proj.pk}}/devices/?status=online">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="font-weight-bold mb-2" id="online_count"></h2>
+              <div>Online Device</div>
+            </div>
+
+            <div>
+              <div class="avatar avatar-lg">
+                <div
+                  class="
+                    avatar-title
+                    bg-success-bright
+                    text-success
+                    rounded-circle
+                  "
+                >
+                  <i class="fa fa-info-circle"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-12">
+    <div class="card">
+      <a href="/{{org.pk}}/{{proj.pk}}/devices/?status=offline">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+         
+            <div>
+              <h2 class="font-weight-bold mb-2" id="offline_count"></h2>
+              <div>Offline Device</div>
+            </div>
+          
+          <div>
+            <div class="avatar avatar-lg">
+              <div
+                class="avatar-title bg-danger-bright text-danger rounded-circle"
+              >
+                <i class="fa fa-ban"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-12">
+    <div class="card">
+      <a href="/{{org.pk}}/{{proj.pk}}/devices/?status=All">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+          
+            <div>
+              <h2 class="font-weight-bold mb-2" id="all_count"></h2>
+              <div>Total Devices</div>
+            </div>
+          
+          <div>
+            <div class="avatar avatar-lg">
+              <div class="avatar-title bg-info-bright text-info rounded-circle">
+                <i class="fas fa-laptop"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </a>
+    </div>
+  </div>
+  <div class="col-lg-3 col-md-6 col-sm-12">
+    <div class="card">
+      <a href="/{{org.pk}}/{{proj.pk}}/devices/?status=not_configured">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center">
+         
+            <div>
+              <h2 class="font-weight-bold mb-2" id="new_count"></h2>
+              <div>New Devices</div>
+            </div>
+          
+          <div>
+            <div class="avatar avatar-lg">
+              <div
+                class="
+                  avatar-title
+                  bg-warning-bright
+                  text-warning
+                  rounded-circle
+                "
+              >
+                <i class="fa fa-cog"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </a>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body" style="position: relative">
+        <div class="d-flex justify-content-between">
+          <h6 class="card-title">CPU Usage</h6>
+        </div>
+        <canvas
+          style="height: 300px !important"
+          class="chart-dashboard"
+          id="cpuChart"
+        ></canvas>
+        
+          <div class="row mt-5 justify-content-md-center">
+            <div class="m-2">
+              <a href="" style="background-color: #0CC077; border-color: #0CC077" class="btn btn-sm btn-primary">
+                0-30%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #79DD7A; border-color: #79DD7A;" class="btn btn-sm btn-primary">
+                30%-60%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FCFC98; border-color: #FCFC98;" class="btn btn-sm btn-primary">
+                60%-90%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FC6962; border-color: #FC6962;" class="btn btn-sm btn-primary">
+                90%-100%
+              </a>
+            </div>
+          </div>
+        
+        
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body" style="position: relative">
+        <div class="d-flex justify-content-between">
+          <h6 class="card-title">RAM Usage</h6>
+        </div>
+        <canvas
+          style="height: 300px !important"
+          class="chart-dashboard"
+          id="ramChart"
+        ></canvas>
+
+        <div class="row mt-5 justify-content-md-center">
+            <div class="m-2">
+              <a href="" style="background-color: #0CC077; border-color: #0CC077" class="btn btn-sm btn-primary">
+                0-30%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #79DD7A; border-color: #79DD7A;" class="btn btn-sm btn-primary">
+                30%-%60
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FCFC98; border-color: #FCFC98;" class="btn btn-sm btn-primary">
+                60%-90%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FC6962; border-color: #FC6962;" class="btn btn-sm btn-primary">
+                90%-100%
+              </a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body" style="position: relative">
+        <div class="d-flex justify-content-between">
+          <h6 class="card-title">DISK Usage</h6>
+        </div>
+        <canvas
+          style="height: 300px !important"
+          class="chart-dashboard"
+          id="diskChart"
+        ></canvas>
+
+        <div class="row mt-5 justify-content-md-center">
+            <div class="m-2">
+              <a href="" style="background-color: #0CC077; border-color: #0CC077" class="btn btn-sm btn-primary">
+                0-30%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #79DD7A; border-color: #79DD7A;" class="btn btn-sm btn-primary">
+                30%-60%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FCFC98; border-color: #FCFC98;" class="btn btn-sm btn-primary">
+                60%-90%
+              </a>
+            </div>
+            <div class="m-2">
+              <a href="" style="background-color: #FC6962; border-color: #FC6962;" class="btn btn-sm btn-primary">
+                90%-100%
+              </a>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+
+  <input id="cpu_usage" type="hidden" value="">
+</div>
+
+{% endblock %} {% block script %}
+<script src="{% static 'assets/js/external_api.js' %}"></script>
+<script src="{% static 'vendors/charts/chartjs/chart.min.js' %}"></script>
+<script src="{% static 'vendors/charts/apex/apexcharts.min.js' %}"></script>
+<script>
+  window.onload = function () {
+    device_info();
+    createChart("cpuChart", cpu_chart);
+    createChart("ramChart", ram_chart);
+    createChart("diskChart", disk_chart);
+    
+    // filter_data1();
+  };
+
+  function createChart(chartId, chartData) {
+    const ctx = document.getElementById(chartId);
+    const cpuChart = new Chart(ctx, {
+      type: chartData.type,
+      data: chartData.data,
+      options: chartData.options,
+    });
+
+    canvas.onclick = function(evt) {
+      
+      var Points = cpuChart.getElementsAtEventForMode(evt, 'nearest', {intersect: true}, true);
+      // console.log(Points)
+      if (Points.length) {
+        var chartData = cpuChart.data.labels[points[0].index];
+        console.log(chartData);
+      }
+    };
+  }
+
+  var usage_cpu = [];
+  var usage_ram = [];
+  var usage_disk = [];  
+
+  setInterval(function () {
+    device_info();
+  }, 10000);
+
+  
+  function device_info() {
+    createChart("cpuChart", cpu_chart);
+    createChart("ramChart", ram_chart);
+    createChart("diskChart", disk_chart);
+    // cpu = JSON.parse("[" + str_cpu + "]");
+    $.ajax({
+      async: false,
+      
+      success: callback, 
+    });
+    // cpu = usage_cpu;
+  }
+
+  function callback(result) {
+    $("#online_count").html(result.online_count);
+        $("#offline_count").html(result.offline_count);
+        $("#all_count").html(result.all_count);
+        $("#new_count").html(result.not_configured_count);
+
+        // usage_cpu[0] = 2
+        // usage_cpu[1] = 10;
+        // usage_cpu[2] = 3;
+        // usage_cpu[3] = 8;
+
+        usage_cpu[0] = result.cpu_30;
+        usage_cpu[1] = result.cpu_60;
+        usage_cpu[2] = result.cpu_90;
+        usage_cpu[3] = result.cpu_100;
+
+        usage_ram[0] = result.ram_30;
+        usage_ram[1] = result.ram_60;
+        usage_ram[2] = result.ram_90;
+        usage_ram[3] = result.ram_100;
+
+        usage_disk[0] = result.disk_30;
+        usage_disk[1] = result.disk_60;
+        usage_disk[2] = result.disk_90;
+        usage_disk[3] = result.disk_100;
+}
+
+
+var canvas = document.getElementById("cpuChart")
+
+
+  const cpu_chart = {
+    type: "doughnut",
+    data: {
+      labels: ["0-30%", "30%-60%", "60%-90%", "90%-100%"],
+      datasets: [
+        {
+          label: "CPU",
+          data: usage_cpu,
+          backgroundColor: [
+          "rgba(12,192,119, 1)",
+            "rgba(121,221,122, 1)",
+            "rgba(252,252,152, 1)",
+            "rgba(252,105,98, 1)",
+          ],
+          borderColor: [
+          "rgba(12,192,119, 1)",
+            "rgba(121,221,122, 1)",
+            "rgba(252,252,152, 1)",
+            "rgba(252,105,98, 1)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      title: {
+        display: true,
+        text: "CPU usage Information",
+      },
+      animation: {
+        animateScale: false,
+        animateRotate: false,
+      },
+      responsive: true,
+      maintainAspectRatio: true,
+
+      legend: {
+        position: "right",
+        labels: {
+          boxWidth: 10,
+          padding: 12,
+        },
+      },
+    },
+
+//      onClick:function(e){
+//      var activePoints = myChart.getElementsAtEvent(e);
+//      var selectedIndex = activePoints[0]._index;
+//      console.log(this.data.datasets[0].data[selectedIndex]);
+//      location.href = 'https://github.com/devgap-software/mms/pull/124/';
+// }
+  };
+
+
+  const ram_chart = {
+    type: "doughnut",
+    data: {
+      labels: ["0-30%", "30%-60%", "60%-90%", "90%-100%"],
+      datasets: [
+        {
+          label: "RAM",
+          data: usage_ram,
+          backgroundColor: [
+          "rgba(12,192,119, 1)",
+            "rgba(121,221,122, 1)",
+            "rgba(252,252,152, 1)",
+            "rgba(252,105,98, 1)",
+          ],
+          borderColor: [
+          "rgba(12,192,119, 1)",
+            "rgba(121,221,122, 1)",
+            "rgba(252,252,152, 1)",
+            "rgba(252,105,98, 1)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      title: {
+        display: true,
+        text: "RAM usage Information",
+      },
+      animation: {
+        animateScale: false,
+        animateRotate: false,
+      },
+      responsive: true,
+      maintainAspectRatio: true,
+
+      legend: {
+        position: "right",
+        labels: {
+          boxWidth: 10,
+          padding: 12,
+        },
+      },
+    },
+  };
+
+
+
+  const disk_chart = {
+    type: "doughnut",
+    data: {
+      labels: ["0-30%", "30%-60%", "60%-90%", "90%-100%"],
+      datasets: [
+        {
+          label: "Disk",
+          data: usage_disk,
+          backgroundColor: [
+          "rgba(12,192,119, 1)",
+            "rgba(121,221,122, 1)",
+            "rgba(252,252,152, 1)",
+            "rgba(252,105,98, 1)",
+          ],
+          borderColor: [
+          "rgba(12,192,119, 1)",
+            "rgba(121,221,122, 1)",
+            "rgba(252,252,152, 1)",
+            "rgba(252,105,98, 1)",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      title: {
+        display: true,
+        text: "DISK usage Information",
+      },
+      animation: {
+        animateScale: false,
+        animateRotate: false,
+      },
+      responsive: true,
+      maintainAspectRatio: true,
+
+      legend: {
+        position: "right",
+        labels: {
+          boxWidth: 10,
+          padding: 12,
+        },
+      },
+    },
+  };
+
+
+  const ctx = document.getElementById('cpuChart');
+
+  const myChart = new Chart(
+    ctx,
+    // config
+  )
+function clickHandler(click){
+  const points = myChart.getElementsAtEventForMode(click, 'nearest',{ intersect: true}, true);
+  if(points.length){
+    const firstPoint = points[0];
+    var value = myChart.data.label[firstPoint.index];
+    console.log(value);
+  }
+}
+
+ctx.onclick = clickHandler;
+
+</script>
+{% endblock %}

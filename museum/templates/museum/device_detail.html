@@ -1,0 +1,516 @@
+{% extends "museum/base.html" %} {% load static %} {% block title %}Device List
+{%endblock%} {% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="row">
+              <div
+                class="
+                  col-6
+                  card-title
+                  d-md-flex
+                  align-items-start
+                  justify-content-between
+                "
+              >
+                <h6 class="card-title">Device - {{node.name}}</h6>
+              </div>
+              <div class="col-6 text-right">
+                <button
+                  data-toggle="modal"
+                  data-target="#exampleModalCenter"
+                  class="btn btn-primary"
+                >
+                  Edit Device
+                </button>
+                <button class="btn btn-danger">Delete Device</button>
+              </div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <div class="col-6"><h5 class="">IP:</h5></div>
+              <div class="col-6"><p class="">{{node.ip}}</p></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <div class="col-6"><h5 class="">Floor:</h5></div>
+              <div class="col-6"><p class="">{{node.floor.name}}</p></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <div class="col-6"><h5 class="">Zone:</h5></div>
+              <div class="col-6"><p class="">{{node.zone.name}}</p></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <div class="col-6"><h5 class="">Exhibit:</h5></div>
+              <div class="col-6"><p class="">{{node.exhibit.name}}</p></div>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="row">
+              <div class="col-6"><h5 class="">Heartbeat Rate:</h5></div>
+              <div class="col-6">
+                <p class="">{{node.heartbeat_rate}} seconds</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div
+              class="
+                card-title
+                d-md-flex
+                align-items-start
+                justify-content-between
+              "
+            >
+              <h6 class="card-title">Monitor</h6>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <div id="apex_chart_three"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div
+              class="
+                card-title
+                d-md-flex
+                align-items-start
+                justify-content-between
+              "
+            >
+              <h6 class="card-title">Command Logs of {{node.name}}</h6>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <table id="myTable" class="table table-striped command_log_table">
+                <div class="row">
+                  <div class="col-1 text-center"><p class="mb-0">S No.</p></div>
+                  <div class="col-1 text-center">
+                    <p class="mb-0">Device name</p>
+                  </div>
+                  <div class="col-1 text-center">
+                    <p class="mb-0">Command</p>
+                  </div>
+                  <div class="col-2">
+                    <p class="mb-0 text-center">Command Status</p>
+                  </div>
+                  <div class="col-4 text-center">
+                    <p class="mb-0">Message</p>
+                  </div>
+                  <div class="col-1 text-center">
+                    <p class="mb-0">Updated By</p>
+                  </div>
+                  <div class="col-2 text-center">
+                    <p class="mb-0">Date/Time</p>
+                  </div>
+                </div>
+                <tbody id="command_log">
+                  <tr></tr>
+                </tbody>
+              </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Model -->
+<div
+  class="modal fade"
+  id="exampleModalCenter"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="exampleModalCenterTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLongTitle">
+          <strong>Detail of Device:</strong> {{node.name}}
+        </h5>
+        <button
+          type="button"
+          class="close"
+          data-dismiss="modal"
+          aria-label="Close"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h6><strong>Unique Code: </strong>{{node.unique_reg_code}}</h6>
+        <h6><strong>IP: </strong>{{node.ip}}</h6>
+        <h6><strong>Mac Address: </strong>{{node.mac_addr}}</h6>
+        <hr />
+
+        <div class="">
+
+          <div class="col-12"><h6>Edit Device</h6></div>
+          <form method="POST">
+            {% csrf_token %}
+          <div class="col-12 my-2">
+            <label>Device Name:</label>
+            <input name='name' value={{node.name}} class="form-control" type="text" />
+          </div>
+          <div class="col-12 my-2">
+            <label>Heartbeat Rate:</label>
+            <input name="heartbeat_rate" value={{node.heartbeat_rate}} class="form-control" type="number" />
+          </div>
+          <div class="col-12 my-2">
+            <label>Floor:</label>
+            <select value={{node.floor_id}} name="floor" onchange="configure_floor()" id="floor_id">
+              <option value={{node.floor_id}} selected>{{node.floor}}</option>
+              {% for i in floor %}
+              <option value={{i.id}}>{{i.name}}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="col-12 my-2">
+            <label>Zone:</label>
+            <select value={{node.zone_id}} name="zone" onchange="configure_zone()" id="zone_id">
+              <option value={{node.zone_id}} selected>{{node.zone}}</option>
+              <!-- <option value="" selected disabled>Select Floor</option> -->
+            </select>
+          </div>
+          <div class="col-12 my-2">
+            <label>Exhibit:</label>
+            <select value={{node.exhibit_id}} name="exhibit" id="exhibit_id">
+              <option value={{node.exhibit_id}} selected>{{node.exhibit}}</option>
+            </select>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary my-2">Save Change</button>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end Edit Model -->
+<!--  -->
+{% endblock %} {% block script %}
+<script src="{% static 'vendors/charts/apex/apexcharts.min.js' %}"></script>
+<script src="{% static 'assets/js/external_api.js' %}"></script>
+<script>
+  window.onload = function () {
+    monitor_data();
+    command();
+  };
+
+  //var monitor = JSON.parse(`{{ node_log | safe }}`);
+
+  //console.log(monitor);
+
+  function apex_chart_three(cpu_usage, disk_usage, ram_usage, updated_at) {
+    var options = {
+      chart: {
+        height: 500,
+        type: "area",
+        animations: {
+          enabled: false,
+        },
+      },
+      markers: {
+        size: 0,
+      },
+      dataLabels: {
+        enabled: false,
+      },
+      stroke: {
+        curve: "smooth",
+      },
+      series: [
+        {
+          name: "CPU",
+          data: cpu_usage,
+        },
+        {
+          name: "RAM",
+          data: ram_usage,
+        },
+        {
+          name: "DISK",
+          data: disk_usage,
+        },
+      ],
+
+      xaxis: {
+        type: "datetime",
+        categories: updated_at,
+      },
+      tooltip: {
+        x: {
+          format: "dd/MM/yy HH:mm",
+        },
+      },
+    };
+
+    var chart = new ApexCharts(
+      document.querySelector("#apex_chart_three"),
+      options
+    );
+
+    chart.render();
+  }
+
+  function monitor_data() {
+    $.ajax({
+      success: function (result) {
+        // console.log(result);
+        // var i = result.cpu_usage.length;
+        // var j = result.ram_usage.length;
+        // var k = result.disk_usage.length;
+        // var l = result.updated_at.length;
+
+        var cpu = result.cpu_usage;
+        var ram = result.ram_usage;
+        var disk = result.disk_usage;
+        var time = result.updated_at;
+
+        cpu.slice(Math.max(cpu.length - 20, 0));
+
+        ram.slice(Math.max(ram.length - 20, 0));
+
+        disk.slice(Math.max(disk.length - 20, 0));
+
+        time.slice(Math.max(time.length - 20, 0));
+
+        // while (i--) {
+        //   (i + 1) % 2 === 0 && cpu.splice(i, 20);
+        // }
+
+        // while (j--) {
+        //   (j + 1) % 2 === 0 && ram.splice(i, 20);
+        // }
+        // while (k--) {
+        //   (k + 1) % 2 === 0 && disk.splice(i, 20);
+        // }
+        // while (l--) {
+        //   (l + 1) % 2 === 0 && time.splice(i, 20);
+        // }
+
+        apex_chart_three(cpu, disk, ram, time);
+
+        // apex_chart_three(
+        //   [
+        //     23, 45, 12, 90, 97, 45, 23, 45, 12, 90, 97, 45, 23, 45, 12, 90, 97,
+        //     45, 23, 45, 12, 90, 97, 45,
+        //   ],
+        //   [
+        //     33, 52, 62, 90, 97, 75, 73, 45, 22, 90, 97, 45, 73, 45, 22, 90, 97,
+        //     45, 73, 45, 22, 90, 97, 45,
+        //   ],
+        //   [
+        //     73, 45, 22, 90, 97, 45, 33, 52, 62, 90, 97, 75, 33, 52, 62, 90, 97,
+        //     75, 33, 52, 62, 90, 97, 75,
+        //   ],
+        //   [
+        //     "2021-10-29T08:17:29.875Z",
+        //     "2021-10-28T08:17:29.875Z",
+        //     "2021-10-27T08:17:29.875Z",
+        //     "2021-10-26T08:17:29.875Z",
+        //     "2021-10-25T08:17:29.875Z",
+        //     "2021-10-24T08:17:29.875Z",
+        //     "2021-10-23T08:17:29.875Z",
+        //     "2021-10-22T08:17:29.875Z",
+        //     "2021-10-21T08:17:29.875Z",
+        //     "2021-10-20T08:17:29.875Z",
+        //     "2021-10-19T08:17:29.875Z",
+        //     "2021-10-18T08:17:29.875Z",
+        //     "2021-10-17T08:17:29.875Z",
+        //     "2021-10-16T08:17:29.875Z",
+        //     "2021-10-15T08:17:29.875Z",
+        //     "2021-10-14T08:17:29.875Z",
+        //     "2021-10-13T08:17:29.875Z",
+        //     "2021-10-12T08:17:29.875Z",
+        //     "2021-10-11T08:17:29.875Z",
+        //     "2021-10-10T08:17:29.875Z",
+        //     "2021-10-09T08:17:29.875Z",
+        //     "2021-10-08T08:17:29.875Z",
+        //     "2021-10-07T08:17:29.875Z",
+        //     "2021-10-06T08:17:29.875Z",
+        //   ]
+        // );
+      },
+    });
+    // cpu = usage_cpu;
+  }
+
+    // function configure_device() {
+
+    //   let data = {};
+    //       // data["single_node_id"] = single_node_id;
+    //       data["name"] = configDevice.name;
+    //       data["heartbeat_rate"] = configDevice.heartbeat;
+
+    //       data["floor"] = configDevice.floor;
+    //       data["zone"] = configDevice.zone;
+    //       data["exhibit"] = configDevice.exhibit;
+
+    //       console.log(data);
+    //       $.ajax({
+    //         type: "POST",
+    //         data: data,
+    //         success: function (result) {
+    //           console.log(result);
+    //           setConfigResult(result.status);
+    //           setTimeout(()=>{setConfigResult('')}, 3000);
+    //           single_node_id = '';
+    //           setConfigDevice({
+    //     name: '',
+    //     heartbeat: null,
+    //     floor: null,
+    //     zone: null,
+    //     exhibit: null
+    //   })
+    //         },
+    //       });
+    //     }
+
+         function configure_floor() {
+            let data = {};
+            data['csrfmiddlewaretoken'] = '{{csrf_token}}';
+
+            data["floor_id"] = $("#floor_id").val();
+
+            $("#zone_id").empty();
+            console.log(data);
+            $.ajax({
+              type: "POST",
+              data: data,
+              success: function (result) {
+                // $("#zone_id").append(`<option value="" selected disabled>Select Zone</option>`);
+               $("#zone_id").append(
+               result.data.map((v) => {
+               console.log(result.data)
+            return $(`<option value=${v.id}>${v.name}</option>`);
+
+          })
+        );
+          },
+        });
+      }
+
+       function configure_zone() {
+        let data = {};
+         data['csrfmiddlewaretoken'] = '{{csrf_token}}';
+        data["zone_id"] = $("#zone_id").val();
+
+        console.log(data);
+         $("#exhibit_id").empty();
+        $.ajax({
+          type: "POST",
+          data: data,
+          success: function (result) {
+            //  $("#exhibit_id").append(`<option value="" selected disabled>Select Exhibit</option>`);
+             $("#exhibit_id").append(
+               result.data.map((v) => {
+
+            return $(`<option value=${v.id}>${v.name}</option>`);
+
+          })
+        );
+          },
+        });
+      }
+
+      function command() {
+        var data = {};
+    data["node_id"] = parseInt('{{node.id}}');
+    console.log(data);
+    $("#command_log").empty();
+    $.ajax({
+      data: data,
+      success: function (result) {
+        console.log(result.data);
+        // $("#command_log").append(
+        //   result.data.map((v, i) => {
+        //     // console.log(v);
+        //     return $(`<tr>
+        //                 <td class="text-center col-1">${i + 1}</td>
+        //                 <td style='display: none'>${v.pk}</td>
+        //                 <td class='text-center col-1'><a href='/{{org.pk}}/{{proj.pk}}/device_detail/${
+        //                   v.pk
+        //                 }'>${v.device_name}</a></td>
+        //                 <td class='text-center col-1'>${v.command_name}</td>
+        //                 <td class="p-0 col-9">
+        //                   <table class="col-12 command_log_table">
+        //                   ${v.multiple
+        //                     .map(
+        //                       (k, i) => `<tr>
+        //                     ${
+        //                       k.status == "FAILED"
+        //                         ? `<td class='text-center col-2'><span class="badge badge-danger">${k.status}</span></td>`
+        //                         : k.status == "ACKNOWLEDGED"
+        //                         ? `<td class='text-center col-2'><span class="badge badge-warning">${k.status}</span></td>`
+        //                         : `<td class='text-center col-2'><span class="badge badge-success">${k.status}</span></td>`
+        //                     }
+        //                     <td class="text-center command_log_table_msg col-6">${
+        //                       k.message
+        //                     }
+        //                     </td>
+        //                     <td class="text-center col-2">${
+        //                       k.updated_by ? "MMS" : "Node"
+        //                     }</td>
+        //                     <td class='text-center col-2'>${getDateTime(
+        //                       k.date
+        //                     )}</td>
+        //                     </tr>`
+        //                     )
+        //                     .join("")}
+        //                 </table></td>
+        //             </tr>`);
+        //   })
+        // );
+      },
+    });
+  }
+
+  function getDateTime(date) {
+    const event = new Date(date);
+    return event.toString().split("G")[0];
+  }
+
+  //   function callback(result) {
+  //     console.log("hello");
+  //     console.log(result);
+  //   }
+</script>
+{% endblock %}

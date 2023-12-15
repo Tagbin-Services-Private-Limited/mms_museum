@@ -1,0 +1,389 @@
+<!DOCTYPE html> {% load static %}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>{% block title %}{% endblock %}</title>
+
+    <!-- Favicon -->
+    <link
+      rel="shortcut icon"
+      href="{% static 'assets/media/image/favicon.ico' %}"
+    />
+
+    <!-- App styles -->
+    <link href="{% static 'css/jquery-ui.css' %}" rel="stylesheet" />
+    <!-- <link href="{% static 'css/theme.min.css' %}" rel="stylesheet"> -->
+    <link
+      href="{% static 'css/all.min.css' %}"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <!-- <link href="{% static 'css/custom.css' %}" rel="stylesheet" type="text/css"> -->
+    <!--<link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />-->
+
+    <!-- Plugin styles -->
+    <!-- Plugin styles -->
+    <link
+      rel="stylesheet"
+      href="{% static 'vendors/bundle.css' %}"
+      type="text/css"
+    />
+    <link rel="stylesheet" href="{% static 'css/main.css' %}" type="text/css" />
+
+    <!-- App styles -->
+    <link
+      rel="stylesheet"
+      href="{% static 'assets/css/app.min.css' %}"
+      type="text/css"
+    />
+    {% block head %}{% endblock %}
+    <script src="{% static 'js/ajax_cdn.js' %}"></script>
+
+    <link
+      href="{% static 'vendors/select2/css/select2.min.css' %}"
+      rel="stylesheet"
+    />
+    <script
+      src="{% static 'vendors/select2/js/select2.min.js' %}"
+      defer
+    ></script>
+  </head>
+
+  <body>
+    <div id="preloader1">
+      <div id="status">&nbsp;</div>
+    </div>
+    <!-- This field is for preloader -->
+    <!-- <div class="preloader">
+<div class="preloader-icon"></div>
+</div> -->
+    <!-- This field is for header -->
+    <div class="header">
+      <div>
+        <ul class="navbar-nav">
+          <!-- begin::navigation-toggler -->
+          <li class="nav-item navigation-toggler">
+            <a href="#" class="nav-link" title="Hide navigation">
+              <i data-feather="arrow-left"></i>
+            </a>
+          </li>
+          <li class="nav-item navigation-toggler mobile-toggler">
+            <a href="#" class="nav-link" title="Show navigation">
+              <i data-feather="menu"></i>
+            </a>
+          </li>
+          <!-- end::navigation-toggler -->
+        </ul>
+      </div>
+
+      <div>
+        <ul class="navbar-nav">
+          <!-- <li class="text-center g-search">
+            <input type="search" placeholder="Search for any device" />
+
+          </li> -->
+          <li class="nav-item dropdown">
+            <a
+              href="#"
+              class="nav-link"
+              title="User menu"
+              data-toggle="dropdown"
+              aria-expanded="false"
+            >
+              <i data-feather="user"></i>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right dropdown-menu-big">
+              <div class="p-4 text-center d-flex justify-content-between">
+                <h6 class="mb-0"></h6>
+              </div>
+              <div>
+                <ul class="list-group list-group-flush">
+                  <li class="list-group-item">
+                    <a href="/logout/"> Logout </a>
+                  </li>
+                  <li class="list-group-item">
+                    <a href=/{{org.pk}}/{{proj.pk}}/change_password> Change Password </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </li>
+        </ul>
+
+        <!-- begin::mobile header toggler -->
+        <ul class="navbar-nav d-flex align-items-center">
+          <li class="nav-item header-toggler">
+            <a href="#" class="nav-link">
+              <i data-feather="arrow-down"></i>
+            </a>
+          </li>
+        </ul>
+        <!-- end::mobile header toggler -->
+      </div>
+    </div>
+    <!-- This field is for main content -->
+    <div id="main">
+      <!-- begin::navigation -->
+      <div class="navigation">
+        <!-- begin::navigation menu -->
+        <div class="navigation-menu-body">
+          <!-- begin::navigation-logo -->
+          <div>
+            <div id="navigation-logo">
+              {% if mms_user.enable_dashboard %}
+              <a href="/{{org.pk}}/{{proj.pk}}/dashboard">
+              {% endif %}
+                <img
+                  class="logo"
+                  src="/static/images/Logo.png"
+                  alt="logo"
+                  style="width: 40%; padding: 10%"
+                />
+                <img
+                  class="logo-light"
+                  src="/static/images/Logo.png"
+                  alt="light logo"
+                />
+              </a>
+            </div>
+          </div>
+          <!-- end::navigation-logo -->
+
+          <div class="navigation-menu-group">
+            <div class="open" id="dashboards">
+              <ul>
+                <!-- <li class="navigation-divider">Dashboards</li> -->
+                {% if mms_user.enable_dashboard %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/dashboard">Dashboard</a>
+                </li>
+                {% endif %}
+                {% if mms_user.enable_devices %}
+                <li><a href="/{{org.pk}}/{{proj.pk}}/devices">Devices</a></li>
+                {% endif %}
+                {% if mms_user.enable_content_upload %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/content_upload"
+                    >Content Upload</a
+                  >
+                </li>
+                {% endif %}
+                {% if mms_user.enable_software_update %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/software_update"
+                    >Software Update</a
+                  >
+                </li>
+                {% endif %}
+                {% if mms_user.enable_command_logs %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/command_logs"
+                    >Command Logs</a
+                  >
+                </li>
+                {% endif %}
+                {% if mms_user.enable_show %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/show">Show</a>
+                </li>
+                {% endif %}
+                {% if mms_user.enable_control_panel %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/control_panel"
+                    >Control Panel</a
+                  >
+                </li>
+                {% endif %}
+                {% if mms_user.enable_moderation1 %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/show_on_ui">Moderation 1</a>
+                </li>
+                {% endif %}
+                {% if mms_user.enable_moderation2 %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/delete_from_ui">Moderation 2</a>
+                </li>
+                {% endif %}
+                {% if mms_user.enable_museum_on_off %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/museum_on_off/">Museum On/Off</a>
+                </li>
+                {% endif %}
+                {% if mms_user.enable_reports %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/reports/">Reports</a>
+                </li>
+                {% endif %}
+                {% if mms_user.enable_analytics %}
+                <li>
+                  <a href="/{{org.pk}}/{{proj.pk}}/analytics/">Analytics</a>
+                </li>
+                {% endif %}
+
+               <!-- <li>
+                  <a href="#">Master Configure</a>
+                  <ul>
+                    <li>
+                      <a href="">Project</a>
+                      <a href="">Floor </a>
+                      <a href="">Zone </a>
+                      <a href="">Exhibit</a>
+                      <hr class="mx-4" />
+                      <a href="">Tag </a>
+                    </li>
+                  </ul>
+                </li>-->
+              </ul>
+            </div>
+          </div>
+        </div>
+        <!-- end::navigation menu -->
+      </div>
+      <!-- end::navigation -->
+
+      <!-- begin::main-content -->
+      <div class="main-content">
+        <!-- begin::page-header -->
+
+        <!-- end::page-header -->
+
+        <!-- begin::page content -->
+        <div class="container-fluid" id="mainDiv">
+          {% block content %}{% endblock %} {% block body %} {% endblock body %}
+        </div>
+        <!-- end::page content -->
+
+        <!-- begin::footer -->
+        <footer>
+          <div class="container-fluid">
+            <div>
+              © 2020 Made by
+              <a target="_blank" href="https://devgap.uk/">DEVGAP</a>
+            </div>
+          </div>
+        </footer>
+        <!-- end::footer -->
+      </div>
+      <!-- end::main-content -->
+    </div>
+    <div
+      class="modal fade"
+      id="staticModal"
+      tabindex="-1"
+      role="dialog"
+      data-keyboard="false"
+      data-backdrop="static"
+      style="display: none"
+    >
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div
+          class="modal-content"
+          style="background: transparent; border: 0; margin-top: 10%"
+        >
+          <div class="modal-body">
+            <div
+              class="spinner-border text-primary"
+              role="status"
+              style="width: 20rem; height: 20rem"
+            >
+              <span class="sr-only">Loading...</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Plugin scripts -->
+   <script src="{% static 'vendors/bundle.js' %}"></script>
+
+    <!-- App scripts -->
+    <script src="{% static 'assets/js/app.js' %}"></script>
+    <script>
+      toastr.options = {
+        timeOut: 3000,
+        progressBar: true,
+        showMethod: "slideDown",
+        hideMethod: "slideUp",
+        showDuration: 200,
+        hideDuration: 200,
+        positionClass: "toast-top-center",
+      };
+
+      $("a[href='" + window.location.pathname + "']").attr("class", "active");
+      $("a[href='" + window.location.pathname + "']")
+        .parent()
+        .parent()
+        .parent()
+        .children()
+        .click();
+
+      function showLoader() {
+        $("#staticModal").modal("show");
+      }
+
+      function hideLoader() {
+        $("#staticModal").modal("hide");
+      }
+    </script>
+
+    {% block javascript %}
+
+    <!-- Bootstrap JS and its dependencies-->
+   <!-- <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+      integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+      crossorigin="anonymous"
+    ></script>-->
+    <!-- Your stuff: Third-party javascript libraries go here -->
+    <!-- place project specific Javascript in this file -->
+    <script src="{% static 'js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'js/jquery-ui.js' %}"></script>
+    <script src="{% static 'js/theme.min.js' %}"></script>
+    <script src="{% static 'admin/js/Chart.min.js' %}"></script>
+    <!-- <script src="{% static 'admin/js/chart-pie-demo.js' %}"></script> -->
+    <script>
+      localStorage.setItem("project", $("#project_select").val());
+
+      $(window).on("load", function () {
+        // makes sure the whole site is loaded
+        $("#status").fadeOut(); // will first fade out the loading animation
+        $("#preloader1").delay(350).fadeOut("slow"); // will fade out the white DIV that covers the website.
+        $("body").delay(350).css({ overflow: "visible" });
+      });
+      $(document).ready(function () {
+        var err = "{{ error }}";
+        if (err != "") {
+          toastr.error(err);
+        }
+        var success = "{{ success }}";
+        if (success != "") {
+          toastr.success(success);
+        }
+
+        $("select").addClass("form-control");
+        $("input").addClass("form-control");
+      });
+
+      function project_selection() {
+        var data = {};
+        var unique_project_id = $("#project_select").val();
+
+        data["unique_project_id"] = unique_project_id;
+
+        console.log(data);
+        $.ajax({
+          type: "POST",
+          data: data,
+          success: function (result) {
+            console.log(result);
+          },
+        });
+      }
+    </script>
+    {% endblock javascript %} {% block script %}{% endblock %}
+  </body>
+</html>
