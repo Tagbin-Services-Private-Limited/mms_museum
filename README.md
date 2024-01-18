@@ -1,1 +1,2 @@
-# mms_museum
+# mms
+Museum Management Solution django backend application

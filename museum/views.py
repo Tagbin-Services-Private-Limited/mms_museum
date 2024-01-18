@@ -49,8 +49,10 @@ from .decorators import module_is_entry_mms_user
 
 #Function for tcp encryption
 def encrypt(message, pub_key):
+    print("inside encrypt", message, pub_key)
     cipher = PKCS1_OAEP.new(pub_key)
     return cipher.encrypt(message)
+
 # Create your views here.
 
 # @api_view(['POST'])
@@ -188,7 +190,7 @@ class node_registration(APIView):
 				nodeO.pem_file=pem_file
 				nodeO.user=user
 				print("---------------------node o valje",nodeO)
-				projectO=Project.objects.get(name="Testing museum")
+				projectO=Project.objects.get(name="NACIN PROJECT")
 				nodeO.project=projectO
 				nodeO.encrypted_port=encrypted_port
 				print("---------------------node o valje",nodeO)
@@ -587,6 +589,7 @@ def devices(request,org_id,proj_id):
 					command_logO.created_by=request.user
 					command_logO.updated_by=request.user
 					command_logO.save()
+					print(commandO.name,"------------comaand name")
 					if commandO.name == "TurnOn":
 						send_magic_packet(i.mac_addr)
 						command_log_batchO=CommandLogBatch.objects.create()
@@ -596,7 +599,9 @@ def devices(request,org_id,proj_id):
 						command_log_batchO.updated_by=request.user
 						command_log_batchO.save()
 					else:
+						print(i.ip,i.port,commandO.name+' '+str(command_logO.pk))
 						tcp = TCPClient()
+						print("tcp",tcp)
 						tcp_response = tcp.sendTcpCommand(i.ip,i.port,commandO.name+' '+str(command_logO.pk))
 
 						if tcp_response==True:

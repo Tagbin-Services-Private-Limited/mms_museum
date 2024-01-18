@@ -10,6 +10,7 @@ from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 
 def encrypt(message, pub_key):
+    print('inside encrypt++++++++++++++++++++=', message,'***** ', pub_key)
     cipher = PKCS1_OAEP.new(pub_key)
     return cipher.encrypt(message)
 
@@ -64,10 +65,13 @@ class TCPClient():
         
         try:
             nodeO=Node.objects.get(ip=ip)
-            if nodeO.pem_file:
+            if False:
+                print('pem file inside if-------------',message, type(message),nodeO.pem_file)
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((ip, 2627))
-                sock.sendall(encrypt(message.encode(),RSA.importKey(nodeO.pem_file)))
+                encrypted_message=encrypt(message.encode(),RSA.importKey(nodeO.pem_file))
+                print
+                sock.sendall(encrypted_message)
                 sock.setblocking(0)
                 # data = sock.recv(1024)
                 # print('Received', repr(data))
@@ -90,6 +94,7 @@ class TCPClient():
 
                 
             else:
+                print('no pem file inside else')
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.connect((ip, int(port)))
                 sock.sendall(message.encode())

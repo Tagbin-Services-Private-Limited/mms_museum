@@ -26,8 +26,11 @@ SECRET_KEY = 'django-insecure-5za6hoare&2ou2y+%em4@%y8+@%z^qortbd(dwfv!a8lpp3oxf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['192.168.1.167','0.0.0.0','*','localhost','127.0.0.1']
+WSGI_APPLICATION = 'mms.wsgi_windows.application'
 
+# SECURE_SSL_REDIRECT = True
 
 # Application definition
 
@@ -45,7 +48,7 @@ INSTALLED_APPS = [
     'import_export',
     'gunicorn',
     'django_crontab',
-
+    'sslserver',
  ]
 
 MIDDLEWARE = [
@@ -83,21 +86,23 @@ WSGI_APPLICATION = 'mms.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-DATABASES = {
-   'default': {
-       'ENGINE': 'django.db.backends.sqlite3',
-       'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
 # DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'OPTIONS': {
-#             'read_default_file': '/etc/mysql/my.cnf',
-#         },
+#    'default': {
+#        'ENGINE': 'django.db.backends.sqlite3',
+#        'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'mysql',
+        'USER': 'root',
+        # 'PASSWORD': 'root',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
 
 
 # Password validation
